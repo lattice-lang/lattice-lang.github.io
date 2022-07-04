@@ -91,7 +91,7 @@ var thisBrowser = ip_Browser();
 
         ip_GridProps['index'].browser = ip_Browser();
 
-        //Setup grid constructer properties
+        //Setup grid constructor properties
         ip_GridProps[options.id] = $().ip_gridProperties({
             id: options.id,
             publicKey: options.publicKey,
@@ -681,7 +681,7 @@ var thisBrowser = ip_Browser();
 
         if (options.selectAsRange) { $(this).ip_SelectRange({ startCell: cell, multiselect: options.multiselect }); }
 
-        //Set focus to grid - importaint for events to be focused on grid
+        //Set focus to grid - important for events to be focused on grid
         $('#' + GridID).focus();
         
         if (options.raiseEvent) {
@@ -693,7 +693,7 @@ var thisBrowser = ip_Browser();
     $.fn.ip_UnSelectCell = function (options) {
         var options = $.extend({
 
-            //No options becausewe can only have one selected cell
+            //No options because we can only have one selected cell
         }, options);
 
         var GridID = $(this).attr('id');
@@ -1058,7 +1058,7 @@ var thisBrowser = ip_Browser();
             highlightType: 'ip_grid_cell_rangeHighlight_activecell', //css class defining the highlight type
             fadeIn: false,
             fadeOut: false,
-            expireTimeout:0 //Removes the highlight after x miliseconds
+            expireTimeout:0 //Removes the highlight after x milliseconds
 
         }, options);
 
@@ -1083,7 +1083,7 @@ var thisBrowser = ip_Browser();
             endCell = options.endCell;
 
             var RangeHighlight = $('#' + GridID + '_rangeHighlight').clone(); //Clone the range selector tool (so that we can add multiple range selectors)
-            var CellQuad = $(startCell).parent().parent().parent().parent().parent(); //choose the cells container div so we know where to add the range selector tool
+            var CellQuad = $(startCell).parent().parent().parent().parent().parent(); //choose the cell's container div, so we know where to add the range selector tool
             var RangeHighlightID = ip_setRangeHighlightID(GridID, RangeHighlight, options.startCellOrdinates, options.endCellOrdinates);
 
             $(RangeHighlight).appendTo(CellQuad);
@@ -1212,7 +1212,7 @@ var thisBrowser = ip_Browser();
             
 
 
-        //We validate merge's inside nomalize range options
+        //We validate merges inside normalized range options
         options = ip_ValidateRangeOptions(GridID, options);
         if (!options) { return false; }
 
@@ -1224,7 +1224,7 @@ var thisBrowser = ip_Browser();
             endCell = options.endCell;
 
             var Range = $('#' + GridID + '_rangeselector').clone(); //Clone the range selector tool (so that we can add multiple range selectors)
-            var CellQuad = ($(startCell).parent().parent().parent().parent().parent())[0]; //choose the cells container div so we know where to add the range selector tool
+            var CellQuad = ($(startCell).parent().parent().parent().parent().parent())[0]; //choose the cell's container div, so we know where to add the range selector tool
             var CellSelectorKey = $(Range).children('.ip_grid_cell_rangeselector_key');
             var RangeBorder = $(Range).children('.ip_grid_cell_rangeselector_border');
             var RangeID = ip_setRangeID(GridID, Range, options.startCellOrdinates, options.endCellOrdinates);
@@ -1275,7 +1275,7 @@ var thisBrowser = ip_Browser();
                     if (e.which == 1 && !ip_GridProps[GridID].resizing) {
 
                         ip_ShowRangeMove(GridID, Range, e, this);
-                        if (!ip_GridProps[GridID].scrollAnimate) { ip_EnableScrollAnimate(GridID); } //This is now handleded in the mouseenter event for the cell                       
+                        if (!ip_GridProps[GridID].scrollAnimate) { ip_EnableScrollAnimate(GridID); } //This is now handled in the mouseenter event for the cell
 
 
                     }
@@ -1683,7 +1683,7 @@ var thisBrowser = ip_Browser();
         var options = $.extend({
 
             range: null, //[{ startRow: null, startCol: null, endRow: null, endCol: null }] array of range object
-            rangeElement: null, //[div] array of actual range elemnt
+            rangeElement: null, //[div] array of actual range element
             rangeID: null, //[ID] array of actual range element ID
             cut: false,
             toClipBoard: true
@@ -1844,7 +1844,7 @@ var thisBrowser = ip_Browser();
                                                         
                             if (!options.cut || ( arrToRange[i].existingMerges.merges[m].containsOverlap && !ip_IsMergeInRange(GridID, arrToRange[i].existingMerges.merges[m], arrFromRange))) { 
                                 $(this).ip_RangeHighlight({ fadeOut: true, expireTimeout: 3000, highlightType: 'ip_grid_cell_rangeHighlight_alert', multiselect: true, color: '#ff5a00', range: { startRow: arrToRange[i].existingMerges.merges[m].mergedWithRow, startCol: arrToRange[i].existingMerges.merges[m].mergedWithCol } }); 
-                                Error = 'When placing cells, make sure they dont partcially overlap an existing merge';
+                                Error = 'When placing cells, make sure they dont partially overlap an existing merge';
                             }
 
                         }
@@ -1891,7 +1891,7 @@ var thisBrowser = ip_Browser();
                             }
                         }
 
-                        //Remove merges if they dont overlap
+                        //Remove merges if they don't overlap
                         for (var m = 0; m < fromRangeData[i].mergeData.length; m++) {
                             if (!fromRangeData[i].mergeData[m].containsOverlap) {
 
@@ -1931,12 +1931,12 @@ var thisBrowser = ip_Browser();
                             //Add data to undo stack
                             ip_AddUndoTransactionData(GridID,CellUndoData,ip_CloneCell(GridID, r, c));
                             
-                            //Paste the origonal values,  removing merges (which will get added later)
+                            //Paste the original values,  removing merges (which will get added later)
                             var fromCell = fromRangeData[i].rowData[rIndex].cells[cIndex];
                             var fxIndex = ip_GridProps[GridID].rowData[r].cells[c].fxIndex;
 
                             ip_GridProps[GridID].rowData[r].cells[c] = fromCell;
-                            ip_GridProps[GridID].rowData[r].cells[c].fxIndex = fxIndex; //set the old index so it can be properly removed in SetCellFormula method                            
+                            ip_GridProps[GridID].rowData[r].cells[c].fxIndex = fxIndex; //set the old index, so it can be properly removed in SetCellFormula method
 
                             //Update this cells formula
                             ip_SetCellFormula(GridID, { row: r, col: c, formula: (options.changeFormula ? ip_MoveFormulaOrigon(GridID, ip_GridProps[GridID].rowData[r].cells[c].formula, fromCell.row, fromCell.col, r, c, null, (options.cut ? arrFromRange[i] : null)) : ip_GridProps[GridID].rowData[r].cells[c].formula) }); 
@@ -2091,7 +2091,7 @@ var thisBrowser = ip_Browser();
             
             for (var i = 0; i < arrRange.length; i++) {
 
-                //Validate that the merge exceedes one cell
+                //Validate that the merge exceeds one cell
                 if ((arrRange[i].startRow != arrRange[i].endRow) || (arrRange[i].startCol != arrRange[i].endCol)) {
 
 
@@ -2192,7 +2192,7 @@ var thisBrowser = ip_Browser();
         //Validate merges
         for (var i = 0; i < arrRange.length; i++) {
 
-            //Checks that we are not merging ontop of merges
+            //Checks that we are not merging on top of merges
             var ValidateMerges = ip_ValidateRangeMergedCells(GridID, arrRange[i].startRow, arrRange[i].startCol, arrRange[i].endRow, arrRange[i].endCol);
             arrRange[i].merges = ValidateMerges.merges;
 
@@ -2211,7 +2211,7 @@ var thisBrowser = ip_Browser();
             //Do the unmerge
             for (var i = 0; i < arrRange.length; i++) {
 
-                //Validate that the merge exceedes one cell
+                //Validate that the merge exceeds one cell
                 //var merges = ip_ValidateRangeMergedCells(GridID, arrRange[i].startRow, arrRange[i].startCol, arrRange[i].endRow, arrRange[i].endCol);
                 var merges = arrRange[i].merges;
                 var MergeUndoData = ip_AddUndo(GridID, 'ip_UnMergeRange', TransactionID, 'MergeData', arrRange[i], arrRange[i], { row: arrRange[i].startRow, col: arrRange[i].startCol });
@@ -2284,7 +2284,7 @@ var thisBrowser = ip_Browser();
             if (options.range[i].endRow >= ip_GridProps[GridID].rows) { options.range[i].endRow = ip_GridProps[GridID].rows - 1; }
             if (options.range[i].endCol >= ip_GridProps[GridID].cols) { options.range[i].endCol = ip_GridProps[GridID].cols - 1; }
 
-            //Valiudate sort by column 
+            //Validate sort by column
             if (options.range[i].col == null) { options.range[i].col = (options.col == null ? options.range[i].startCol : options.col); }
             if (options.range[i].col < options.range[i].startCol) { options.range[i].col = options.range[i].startCol; }
             if (options.range[i].col > options.range[i].endCol) { options.range[i].col = options.range[i].endCol; }
@@ -2380,7 +2380,7 @@ var thisBrowser = ip_Browser();
                         }
                         else {
 
-                            //Range not full loaded so we need to sort on the server                            
+                            //Range not full loaded, so we need to sort on the server
                             var FunctionUndoData = ip_AddUndo(GridID, 'ip_Sort', TransactionID, 'undoServer', options.range[i], options.range[i], { row: options.range[i].startRow, col: options.range[i].startCol });                      
                             Effected.rowDataLoading = true;
                             
@@ -2645,7 +2645,7 @@ var thisBrowser = ip_Browser();
 
                 });
 
-                //Deals with regular keypress, filtering drop down. NOTE we cant use the keydown event because it wont capture the character when shift is pressed
+                //Deals with regular keypress, filtering drop down. NOTE we can't use the keydown event because it won't capture the character when shift is pressed
                 ip_UnBindEvent(editToolInput, 'keypress', ip_GridProps[GridID].events.textEditTool_KeyPress);
                 $(editToolInput).keypress(ip_GridProps[GridID].events.textEditTool_KeyPress = function (e) {
 
@@ -2728,14 +2728,14 @@ var thisBrowser = ip_Browser();
 
             $('#' + GridID).ip_RemoveRangeHighlight();
 
-            //Buld an array of the undo stack so we can sort it
+            //Build an array of the undo stack, so we can sort it
             for (var key in ip_GridProps[GridID].undo.undoStack) {
                 if (ip_GridProps[GridID].undo.undoStack.hasOwnProperty(key)) {
                     sortedStack.push(ip_GridProps[GridID].undo.undoStack[key]);
                 }
             }
 
-            //Sort stack descending with the latest transaction frist
+            //Sort stack descending with the latest transaction first
             sortedStack.sort(function (a, b) { return b.transactionSeq - a.transactionSeq;  });
             
 
@@ -3233,10 +3233,10 @@ var thisBrowser = ip_Browser();
                 ok: {
                     text: 'SAVE', style: "background: #4d9c3b; background: -moz-linear-gradient(top,  #4d9c3b 0%, #1b6d00 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#4d9c3b), color-stop(100%,#1b6d00)); background: -webkit-linear-gradient(top,  #4d9c3b 0%,#1b6d00 100%); background: -o-linear-gradient(top,  #4d9c3b 0%,#1b6d00 100%); background: -ms-linear-gradient(top,  #4d9c3b 0%,#1b6d00 100%); background: linear-gradient(to bottom,  #4d9c3b 0%,#1b6d00 100%); filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4d9c3b', endColorstr='#1b6d00',GradientType=0 ); ", onClick: function () {
 
-                        //This code warrents an explination:
+                        //This code warrants an explanation:
                         //It checks to see what was formatting options were changed, and only if an option changed does it save the change. 
-                        //It looks at the ip-dirty class to indecate if a filed has changed.
-                        //By only saving changed stuff, allows us to show the default value (column value) but not comit it to the cell object. This is a very effcient way of managing 100000's of rows.
+                        //It looks at the ip-dirty class to indicate if a filed has changed.
+                        //By only saving changed stuff, allows us to show the default value (column value) but not commit it to the cell object. This is a very efficient way of managing 100000's of rows.
                         //Setting an option to "default" resets it so the cell does not contain an actual value and allows it to use the column setting -> this is more memory efficient
 
                         ip_GridProps[GridID].formatting.formatting = false;
@@ -4680,7 +4680,7 @@ var thisBrowser = ip_Browser();
                 $('#ip_FloatingToolbarSpeech').removeClass("topLeft");
                 $('#ip_FloatingToolbarSpeech').removeClass("topRight");
                 $('#ip_FloatingToolbarSpeech').removeClass("Bottom");
-                $('#ip_FloatingToolbarSpeech').removeClass("BotomLeft");
+                $('#ip_FloatingToolbarSpeech').removeClass("BottomLeft");
                 $('#ip_FloatingToolbarSpeech').removeClass("BottomRight");
                 $('#ip_FloatingToolbarSpeech').removeClass("right");
                 $('#ip_FloatingToolbarSpeech').removeClass("rightTop");
@@ -4862,7 +4862,7 @@ var thisBrowser = ip_Browser();
             dataTypes: new Array(), //array of the data type object
             mergeData: {}, // key value pair of ip_mergeObject
             indexedData: {
-                colSymbols: ip_ColumnSymbols(26), //column symboles 0 = a, 1 = b, 2 = c
+                colSymbols: ip_ColumnSymbols(26), //column symbols 0 = a, 1 = b, 2 = c
                 cellIndex: {}, //Static cell indexes
                 formulaData: {} //stores formula objects, cells link to this
             },
@@ -4975,7 +4975,7 @@ var thisBrowser = ip_Browser();
 
         var options = $.extend(ip_rowObject(), options);
         
-        //Setup a the columns
+        //Set up the columns
         if (options.cols != 0) {
             for (var col = 0; col < options.cols; col++) {
                 options.cells[col] = ip_cellObject(null, null, null, options.row, col); //options.row + ' x ' + col
@@ -5242,7 +5242,7 @@ function ip_CloneRow(GridID, row, includeCells) {
     
     
 
-    //For now cloning row cells is not needed anywhere so we will add this feature when it is required
+    //For now cloning row cells is not needed anywhere, so we will add this feature when it is required
     //Create cell undo stack
     if (includeCells) { for (var c = 0; c < ip_GridProps[GridID].rowData[row].cells.length; c++) { Clone.cells[Clone.cells.length] = ip_CloneCell(GridID, row, c); } }
 
@@ -5306,7 +5306,7 @@ function ip_CompareError(GridID, error1, error2) {
 }
 
 
-//----- GRID ARCHITECHTURE --------------------------------------------------------------------------------------------------------------------------------------------------
+//----- GRID ARCHITECTURE --------------------------------------------------------------------------------------------------------------------------------------------------
 
 function ip_DisposeGrid(GridID) {
 
@@ -5460,7 +5460,7 @@ function ip_CreateGridTools(options) {
 
         GridTools += '<div id="' + options.id + '_fBar" class="ip_grid_fbar" style="line-height:' + ip_GridProps[options.id].dimensions.fBarHeight + 'px;height:' + ip_GridProps[options.id].dimensions.fBarHeight + 'px;"><div class="ip_grid_fbar_title"><span class="ip_grid_fbar_f">f</span><span class="ip_grid_fbar_x">x</span></div><div class="ip_grid_fbar_text"></div></div>';
 
-        //This tools must lay outside of the grid objects containment realm    
+        //These tools must lay outside the grid objects containment realm
         $('#' + options.id + '_gridResizer').remove();
         $('#' + options.id).parent().append('<div id="' + options.id + '_gridResizer" title="Resize Grid (double click to split or maximize)"  class="ip_grid_gridResizeTool"><div id="' + options.id + '_gridResizerLine" class="ip_grid_gridResizeToolLine"></div></div>');
 
@@ -5623,7 +5623,7 @@ function ip_CreateGridQuadCell(options, tableColumnsArray) {
         var hideIcon = '';
         var dataTypeName = colData.dataType.dataTypeName != null ? colData.dataType.dataTypeName : ''
 
-        if (colData.hide && colWidth == 0) { colWidth = 0.01; } //this is a chrome fix, without this the border wont show
+        if (colData.hide && colWidth == 0) { colWidth = 0.01; } //this is a chrome fix, without this the border won't show
 
         //if (col < ip_GridProps[options.GridID].cols - 1 && !hide && ip_GridProps[options.GridID].colData[col + 1].hide) { hideIcon = '<div class="ip_grid_cell_hideIcon right"></div>'; }
         if (options.showColSelector && col > 0 && !hide && ip_GridProps[options.GridID].colData[col - 1].hide) { hideIcon += '<div class="ip_grid_cell_hideIcon left"></div>'; }
@@ -5740,7 +5740,7 @@ function ip_CellHtml(GridID, row, col, returnLastIfNull) {
     }
 
 
-    //Retreive cell object
+    //Retrieve cell object
     var CellID = ''
     if (row == -1) {
         var Quad = ip_GetQuad(GridID, row, col);
@@ -5894,14 +5894,14 @@ function ip_SetupEvents(GridID) {
 
     });
 
-    //Deals with selecing a cell & or changing a range ordinates
+    //Deals with selecting a cell & or changing a range ordinates
     $('#' + GridID ).on('mousedown','.ip_grid_cell', function (e) {
         
         var shitClick = e.shiftKey;
         var ctrlClick = e.ctrlKey;
         if (!ip_GridProps[GridID].resizing && !ip_GridProps[GridID].editing.editing) {
             
-            //Check if we have clicked on a range, an make it the last selected range
+            //Check if we have clicked on a range, and make it the last selected range
             if (e.which != 1) {
 
                 var row = parseInt($(this).attr('row'));
@@ -6384,7 +6384,7 @@ function ip_SetupEvents(GridID) {
             ScrollY = ScrollY + 4;
         }
 
-        //Make sure we dont scroll beyond our grid range
+        //Make sure we don't scroll beyond our grid range
         if (ScrollY >= ip_GridProps[GridID].rows) { ScrollY = ip_GridProps[GridID].rows - 1; }
         else if (ScrollY < ip_GridProps[GridID].frozenRows) { ScrollY = ip_GridProps[GridID].frozenRows; }
 
@@ -6626,13 +6626,13 @@ function ip_SetupMerges(GridID, mergeData) {
 function ip_SetupFx(GridID) {
 
     $('#' + GridID).ip_AddFormula({ formulaName: 'range', functionName: 'ip_fxRange', tip: 'Specifies a range of cells, by default the first cell in range is returned.', inputs: '[row][col]:[row][col]', example: 'A1 or A1:B5' });
-    $('#' + GridID).ip_AddFormula({ formulaName: 'count', functionName: 'ip_fxCount', tip: 'Counts the number of cells which have numberic values. Ignores cells that are empty or text.', inputs: '(range1, range2, ... )', example: 'count( a1, b1:b5, a3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'count', functionName: 'ip_fxCount', tip: 'Counts the number of cells which have numeric values. Ignores cells that are empty or text.', inputs: '(range1, range2, ... )', example: 'count( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'sum', functionName: 'ip_fxSum', tip: 'Adds the numbers in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'sum( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'concat', functionName: 'ip_fxConcat', tip: 'Joins the values of cells into one text string.', inputs: '( range1, range2, ... )', example: 'concat( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'dropdown', functionName: 'ip_fxDropDown', tip: 'Fetches a range and returns the values as a dropdown object', inputs: '( range1, range2, ... )', example: 'dropdown( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'gantt', functionName: 'ip_fxGantt', tip: 'Returns true or false if the base date falls within start and end date ranges', inputs: '( BaseDate, StartDate, EndDate, TaskName, ProjectName (optional) )', example: '<br/>gantt( 2014-07-15, 2014-07-01, 2014-07-31, Cost of sales report, General Management )<br/>gantt( today(0), a1, a2, Cost of sales report, General Management )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'max', functionName: 'ip_fxMax', tip: 'Returns the largest number in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'sum( a1, b1:b5, a3 )' });
-    $('#' + GridID).ip_AddFormula({ formulaName: 'today', functionName: 'ip_fxToday', tip: 'Returns todays date', inputs: '(increment in days)', example: '<br/>today( 0 )<br/>today( -1 )<br/>today( 1 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'today', functionName: 'ip_fxToday', tip: 'Returns current date', inputs: '(increment in days)', example: '<br/>today( 0 )<br/>today( -1 )<br/>today( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'date', functionName: 'ip_fxDate', tip: 'Returns the current date', inputs: '(increment in days)', example: '<br/>date( 0 )<br/>date( -1 )<br/>date( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'day', functionName: 'ip_fxDay', tip: 'Returns the calendar day in month', inputs: '(increment in days)', example: '<br/>day( 0 )<br/>day( -1 )<br/>day( 1 )' });
 
@@ -7161,7 +7161,7 @@ function ip_ChangeRange(GridID, RangeOridantes, endCell, animateSpeed, rowIncrem
         animateSpeed = (animateSpeed == null ? 80 : animateSpeed);
         scrollIncrement = (scrollIncrement == null ? 0 : scrollIncrement);
 
-        //Calcuations for new start/end cells
+        //Calculations for new start/end cells
         var startRowCurrent = RangeOridantes[0][0, 0];
         var startColCurrent = RangeOridantes[0][0, 1];
         var endRowCurrent = RangeOridantes[1][0, 0];
@@ -7260,13 +7260,13 @@ function ip_ChangeRange(GridID, RangeOridantes, endCell, animateSpeed, rowIncrem
 
 
 
-        //Calcuate new top
+        //Calculate new top
         NewTop = ip_CalculateRangeTop(GridID, Range, startCell, startRow, startCol, endRow, endCol);
         NewLeft = ip_CalculateRangeLeft(GridID, Range, startCell, startRow, startCol, endRow, endCol);
         MoveToQuad = ip_GetQuad(GridID, startRow, startCol);
         
                 
-        //Caclulate ranges new x/y co-ordinates
+        //Calculate ranges new x/y co-ordinates
         if (CurrentQuad != MoveToQuad) { $(Range).appendTo("#" + GridID + '_q' + MoveToQuad + '_div_container'); }
         if (NewTop >= -1) { $(Range).css('top', NewTop + 'px'); }
         if (NewLeft >= -1) { $(Range).css('left', NewLeft + 'px'); }
@@ -7398,7 +7398,7 @@ function ip_CalculateRangeTop(GridID, Range, startCell, startRow, startCol, endR
     }
     else if (allowHeader == true && row == -1) { NewTop += yControllerBorder; }
 
-    //make sure range dones not vanish into hidden scroll area
+    //make sure range does not vanish into hidden scroll area
     if (Quad == 3 || Quad == 4) {
         if (NewTop > $('#' + GridID + '_q4_scrollbar_container_x').position().top) {
             NewTop = $('#' + GridID + '_q4_scrollbar_container_x').position().top - yControllerBorder;
@@ -7429,7 +7429,7 @@ function ip_CalculateRangeLeft(GridID, Range, startCell, startRow, startCol, end
     var xControllerBorder = parseInt($(Range).css("border-left-width").replace('px', '')) + parseInt($(startCell).css("border-right-width").replace('px', ''));
     var NewLeft = pos.localLeft - xControllerBorder + xCellBorder;
 
-    //This is done purly because pointer-events doesnt work in IE, remove it for IE 10
+    //This is done purely because pointer-events don't work in IE, remove it for IE 10
     if (allowHeader != true && col == -1) {
         NewLeft += ip_GridProps[GridID].dimensions.rowSelectorWidth + (xCellBorder / 2);
     }
@@ -7730,7 +7730,7 @@ function ip_ShowRangeMove(GridID, Range, mouseEventArgs, whichBorder) {
 
             for (var r = 0; r < Ranges.length; r++) {
 
-                //NBNB Relies on the range sequence to be in the array sequence of ip_GridProps[GridID].selectedRange
+                //NB Relies on the range sequence to be in the array sequence of ip_GridProps[GridID].selectedRange
                 $('#' + GridID).ip_SelectRange({ startCellOrdinates: Ranges[r].StartCellOrdinates, endCellOrdinates: Ranges[r].EndCellOrdinates, multiselect: (r == 0 ? false : true) })
 
             }
@@ -7809,9 +7809,9 @@ function ip_HighlightMovePosition(GridID, row, col) {
 function ip_GetRangeData(GridID, byRef, startRow, startCol, endRow, endCol, limitResultsToEditedRowCol, processMerges, makeMergedCellValueSame, includeRowData, includeGroupValue) {
     //This method returns just cell data found within a specific rage
     //If byRef - the data is actually returned by reference so that it can be directly manipulated from the return object
-    //If limitResultsToEditedRowCol - the results returned back are limited to the maximum edited row & column,  NOTE - still need to remove merge data from results if this is the case
+    //If limitResultsToEditedRowCol - the results returned are limited to the maximum edited row & column,  NOTE - still need to remove merge data from results if this is the case
     //If processMerges - returns a summary of merge information for the specified range
-    //If makeMergedCellValueSame - gives a cell the same value as the cell it was merged into (insead of null), use full for some algorythms like sorting
+    //If makeMergedCellValueSame - gives a cell the same value as the cell it was merged into (instead of null), useful for some algorithms like sorting
 
 
     var MaxRow = -1;
@@ -7870,7 +7870,7 @@ function ip_GetRangeData(GridID, byRef, startRow, startCol, endRow, endCol, limi
 
                     ProcessedMerges[MergeKey] = true;
 
-                    //Fetch the origonal instance of the merge
+                    //Fetch the original instance of the merge
                     merge = ip_GridProps[GridID].rowData[merge.mergedWithRow].cells[merge.mergedWithCol].merge;
 
                     //Fetch merge
@@ -7882,7 +7882,7 @@ function ip_GetRangeData(GridID, byRef, startRow, startCol, endRow, endCol, limi
                     RangeData.mergeData[RangeData.mergeData.length - 1].containsOverlap = ip_DoesRangeOverlapMerge(GridID, merge, startRow, startCol, endRow, endCol);
                     
 
-                    //Calculate the merges confined range - this data is usefull if we want to set a range within the scope of a range
+                    //Calculate the merges confined range - this data is useful if we want to set a range within the scope of a range
                     var mergeStartRow = merge.mergedWithRow;
                     var mergeStartCol = merge.mergedWithCol;
                     var mergeEndRow = mergeStartRow + merge.rowSpan - 1;
@@ -7965,7 +7965,7 @@ function ip_DragRange(GridID, options) {
     if (options.range != null && options.dragToRange != null) {
 
 
-        //Calulcate the pattern to use when dragging. This is different for different datatypes
+        //Calculate the pattern to use when dragging. This is different for different datatypes
         var patternCols = {};
 
         for (var r = options.range.endRow; r >= options.range.startRow; r--) {
@@ -7975,7 +7975,7 @@ function ip_DragRange(GridID, options) {
                 var dataType = ip_CellDataType(GridID, r, c, true);
                 var dataTypePrev = ip_CellDataType(GridID, r - 1, c, true);
 
-                //Initialize the pattern object, each column being dragged has a patern object
+                //Initialize the pattern object, each column being dragged has a pattern object
                 if (patternCols[c] == null) {
 
                     patternCols[c] = {
@@ -8115,7 +8115,7 @@ function ip_ValidateRangeObjects(GridID, ranges, hRow, hCol) {
 }
 
 function ip_ValidateRangeObject(GridID, range, hRow, hCol) {
-    //Universal range validation obejct
+    //Universal range validation object
 
     if (range != null) {
 
@@ -8310,7 +8310,7 @@ function ip_InitScrollX(GridID, ScrollInterval, ShowX, ShowY, PlacementX, Placem
     $('#' + GridID + '_q2_container').css('width', ScrollContainerWidth + 'px');
     $('#' + GridID + '_q4_container').css('width', ScrollContainerWidth + 'px');
 
-    //Set quadraht widths, needed bacause the absolute positioning of veritcal scroll bar 
+    //Set quadrant widths, needed because the absolute positioning of vertical scroll bar
     $('#' + GridID + '_q2').css('width', ScrollContainerWidth + ScrollBarY_width + 'px');
     $('#' + GridID + '_q4').css('width', ScrollContainerWidth + ScrollBarY_width + 'px');
 
@@ -8396,7 +8396,7 @@ function ip_InitScrollX_Large(GridID, ScrollInterval, ShowX, ShowY, PlacementX, 
     $('#' + GridID + '_q2_container').css('width', ScrollContainerWidth + 'px');
     $('#' + GridID + '_q4_container').css('width', ScrollContainerWidth + 'px');
 
-    //Set quadraht widths, needed bacause the absolute positioning of veritcal scroll bar 
+    //Set quadrant widths, needed because the absolute positioning of vertical scroll bar
     $('#' + GridID + '_q2').css('width', ScrollContainerWidth + ScrollBarY_width + 'px');
     $('#' + GridID + '_q4').css('width', ScrollContainerWidth + ScrollBarY_width + 'px');
 
@@ -8492,7 +8492,7 @@ function ip_InitScrollX_Large(GridID, ScrollInterval, ShowX, ShowY, PlacementX, 
 
                 if (ui.position.left > dragPos || ui.position.left < dragPos) { ScrollX = parseInt((ui.position.left * ScrollInterval) + ip_GridProps[GridID].frozenCols); }
 
-                //Make sure we dont scroll beyond our grid range
+                //Make sure we don't scroll beyond our grid range
                 if (ScrollX >= ip_GridProps[GridID].cols) { ScrollX = ip_GridProps[GridID].cols - 1; }
                 else if (ScrollX < ip_GridProps[GridID].frozenCols) { ScrollX = ip_GridProps[GridID].frozenCols; }
 
@@ -8685,7 +8685,7 @@ function ip_InitScrollY_Large(GridID, ScrollInterval, Show, Placement) {
                           
                 //}
 
-                //Show scroll indecator if turned on or rows are hidden
+                //Show scroll indicator if turned on or rows are hidden
                 if (ShowRowIndecator) { $('#' + GridID + '_q4_scrollbar_gadget_scrollIndecator_y').text(ScrollY + (ip_GridProps[GridID].rowData[ScrollY].hide ? ' (hidden)' : '') + " ..."); }
                 else if(ip_GridProps[GridID].rowData[ScrollY].hide)
                 {
@@ -8815,7 +8815,7 @@ function ip_ScrollToY(GridID, ScrollToRow, SetScrollGadget, reloadRanges, hideRa
         clearTimeout(ip_GridProps[GridID].timeouts.scrollYCompleteTimeout);
 
 
-        //Valide the scroll to row
+        //Valid the scroll to row
         var direction = (ip_GridProps[GridID].scrollY < ScrollToRow ? 'down' : 'up');
         if (SetScrollGadget) { ScrollToRow = ip_NextNonHiddenRow(GridID, ScrollToRow, null, ip_GridProps[GridID].scrollY, direction); }
 
@@ -8978,14 +8978,14 @@ function ip_ScrollToX(GridID, ScrollToCol, SetScrollGadget, reloadRanges, hideRa
         ScrollToCol = parseInt(ScrollToCol);
 
 
-        //Valide the scroll to row
+        //Valid the scroll to row
         if (ScrollToCol >= ip_GridProps[GridID].cols) { ScrollToCol = ip_GridProps[GridID].cols - 1; }
         else if (ScrollToCol < ip_GridProps[GridID].frozenCols) { ScrollToCol = ip_GridProps[GridID].frozenCols; }
 
 
         if (ip_GridProps[GridID].scrollX < ScrollToCol) {
 
-            ip_GridProps[GridID].scrollX = ScrollToCol; //needed to we append cols at end not begining
+            ip_GridProps[GridID].scrollX = ScrollToCol; //needed to we append cols at end not beginning
 
             //Scroll RIGHT
             if (ScrollToCol > startScrollLoopAt + ip_GridProps[GridID].loadedCols) {
@@ -9028,7 +9028,7 @@ function ip_ScrollToX(GridID, ScrollToCol, SetScrollGadget, reloadRanges, hideRa
         }
         else if (ip_GridProps[GridID].scrollX > ScrollToCol) {
 
-            ip_GridProps[GridID].scrollX = ScrollToCol; //needed to we append cols at end not begining
+            ip_GridProps[GridID].scrollX = ScrollToCol; //needed to we append cols at end not beginning
 
             //Scroll Left
             if (ScrollToCol < startScrollLoopAt - visibleCols) {
@@ -9211,7 +9211,7 @@ function ip_ScrollCell(GridID, direction, startRow, startCol, endRow, endCol, sc
 
     scrollIncrement = (scrollIncrement < 0 ? scrollIncrement * -1 : scrollIncrement);
 
-    //Dont scrol if we are in a frozen zone
+    //Dont scroll if we are in a frozen zone
     if (startRow == endRow && (direction == 'up' || direction == 'down')) {
         var Quad = ip_GetQuad(GridID, startRow, null);
         if (Quad == 1 || Quad == 2) { return }
@@ -9337,7 +9337,7 @@ function ip_AddRow(GridID, options) {
 
         if (row >= ip_GridProps[GridID].rows) {
 
-            //We are adding a NEW row, so make sure its added to the data object
+            //We are adding a NEW row, so make sure it's added to the data object
             //Add to undo stack
             if (TransactionID == null) { TransactionID = ip_GenerateTransactionID(); }
 
@@ -9383,7 +9383,7 @@ function ip_AddRow(GridID, options) {
             ip_CreateGridQuadRow(optionsQ3, RowsQ3);
             ip_CreateGridQuadRow(optionsQ4, RowsQ4);
 
-            //Automatically calulcate the amout of rows to add for a full rerender
+            //Automatically calculate the amount of rows to add for a full rerender
             if (Quad == 3) { ip_GridProps[GridID].dimensions.accumulativeScrollHeight += ip_RowHeight(GridID, row, true); }            
             if (options.fullRerender && ip_GridProps[GridID].dimensions.accumulativeScrollHeight < ip_GridProps[GridID].dimensions.scrollHeight && row < ip_GridProps[GridID].rows - 1) { addCount++; }
 
@@ -9468,7 +9468,7 @@ function ip_RemoveRow(GridID, options) {
     //Validate count
     if ((options.row + options.count) > ip_GridProps[GridID].rows) { options.count = ip_GridProps[GridID].rows - options.row; }
 
-    //Remove row from asthetical view only - mainly used for scrolling
+    //Remove row from aesthetic view only - mainly used for scrolling
     if (options.mode == 'hide') {
         
         for (var c = 0; c < options.count; c++) {
@@ -9501,7 +9501,7 @@ function ip_RemoveRow(GridID, options) {
     else {
 
 
-        //Perminantly destroy ROW
+        //Permanently destroy ROW
         if (options.row < ip_GridProps[GridID].rows) {
 
             var TransactionID = ip_GenerateTransactionID();
@@ -9587,7 +9587,7 @@ function ip_AddCol(GridID, options) {
 
     var options = $.extend({
 
-        col: ip_GridProps[GridID].cols, //By default append a column onto the end
+        col: ip_GridProps[GridID].cols, //By default, append a column onto the end
         count: 1,
         visualize: true,
         appendTo: 'end', //'start' or 'end',
@@ -9633,7 +9633,7 @@ function ip_AddCol(GridID, options) {
         
         if (col >= ip_GridProps[GridID].cols) {
 
-            //We are adding a NEW column, so make sure its added to the data object
+            //We are adding a NEW column, so make sure it's added to the data object
 
             //Add to undo stack
             if (TransactionID == null) { TransactionID = ip_GenerateTransactionID(); }
@@ -9689,7 +9689,7 @@ function ip_AddCol(GridID, options) {
 
             }
 
-            //Add scollable rows
+            //Add scrollable rows
             for (var row = -1; row <= loadedScrollable.rowTo_scroll; row++) {
 
                 optionsQ4 = {
@@ -9727,7 +9727,7 @@ function ip_AddCol(GridID, options) {
             }
             
 
-            //Automatically calulcate the amout of cols to add for a full rerender
+            //Automatically calculate the amount of cols to add for a full rerender
             if (Quad == 2) { ip_GridProps[GridID].dimensions.accumulativeScrollWidth += ip_ColWidth(GridID, col, true); }
             if (options.fullRerender && ip_GridProps[GridID].dimensions.accumulativeScrollWidth < ip_GridProps[GridID].dimensions.scrollWidth && col < ip_GridProps[GridID].cols - 1) { addCount++; }
 
@@ -9782,7 +9782,7 @@ function ip_RemoveCol(GridID, options) {
 
         for (var c = 0; c < options.count; c++) {
 
-            //Remove row from asthetical view only
+            //Remove row from aesthetic view only
             //Remove frozen columns
             for (var row = -1; row < loadedScrollable.rowLoaded_frozen; row++) {
 
@@ -9838,7 +9838,7 @@ function ip_RemoveCol(GridID, options) {
 
     }
     else {
-        //Perminantly destroy column
+        //Permanently destroy column
         if (options.col < ip_GridProps[GridID].cols) {
 
             var TransactionID = ip_GenerateTransactionID();
@@ -9934,7 +9934,7 @@ function ip_InsertCol(GridID, options){
 
     var options = $.extend({
 
-        col: ip_GridProps[GridID].cols, //By default append a column onto the end
+        col: ip_GridProps[GridID].cols, //By default, append a column onto the end
         count: 1,
         appendTo: 'before', //'before' or 'after',
         render: true,
@@ -10045,7 +10045,7 @@ function ip_InsertCol(GridID, options){
     }
     else {
 
-        //Add column onto end - not add col handles all the logisics independantly
+        //Add column onto end - not add col handles all the logistics independently
         ip_AddCol(GridID, { count: options.count });  
                 
     }
@@ -10109,7 +10109,7 @@ function ip_InsertRow(GridID, options) {
             ip_GridProps[GridID].rowData.splice(RowToSplice, 0, RowObj);
 
             //The code below is commented out because it is not handled on the server side
-            //Increase the amount of frozen columns if the col to add is inside fozen columns
+            //Increase the amount of frozen columns if the col to add is inside frozen columns
             //if (Quad == 1 && ip_GridProps[GridID].frozenRows > 0) {
             //    ip_GridProps[GridID].frozenRows++;
             //    ip_GridProps[GridID].scrollY++;
@@ -10156,7 +10156,7 @@ function ip_InsertRow(GridID, options) {
     }
     else {
 
-        //Add column onto end - not add col handles all the logisics independantly            
+        //Add column onto end - not add col handles all the logistics independently
         ip_AddRow(GridID, { count: options.count });
     }
 
@@ -10621,7 +10621,7 @@ function ip_ShowGridResizerHandle(GridID) {
     var containment = $(document.body); //$('#' + GridID).parent();
 
 
-    //Deals with: reisizing the grid
+    //Deals with: resizing the grid
     $(Resizer).unbind('dblclick');
     $(Resizer).on('dblclick', function (e) {
 
@@ -10737,7 +10737,7 @@ function ip_MoveColumn(GridID, options) {
     var toRange = { startCol: toCol, endCol: toCol + count - 1, startRow: 0, endRow: ip_GridProps[GridID].rows - 1 };
     var moveRange = { startCol: col, endCol: col + count - 1, startRow: 0, endRow: ip_GridProps[GridID].rows - 1 };
 
-    //Only alow the move if our range does not contain an overlap
+    //Only allow the move if our range does not contain an overlap
     if (validateResult.valid) {
 
         if (col >= 0 && col < ip_GridProps[GridID].cols && toCol >= 0 && toCol < ip_GridProps[GridID].cols) {
@@ -10751,7 +10751,7 @@ function ip_MoveColumn(GridID, options) {
             //Remove merges
             for (var m = 0; m < validateResult.containsMerges.merges.length; m++) { ip_ResetCellMerge(GridID, validateResult.containsMerges.merges[m].mergedWithRow, validateResult.containsMerges.merges[m].mergedWithCol); }
 
-            //Reshuffle exsting merges appropriatly
+            //Reshuffle existing merges appropriately
             if (colDiff > 0) { ip_ReshuffelMergesCol(GridID, col, toCol + count - 1, -count, false); } //Right
             else { ip_ReshuffelMergesCol(GridID, toCol, col, count, false); } //left   
 
@@ -10918,7 +10918,7 @@ function ip_MoveRow(GridID, options) {
     var moveRange = { startRow: row, endRow: row + count - 1, startCol: 0, endCol: ip_GridProps[GridID].cols - 1 };
     var toRange = { startRow: toRow, endRow: toRow + count - 1, startCol: 0, endCol: ip_GridProps[GridID].cols - 1 };
 
-    //Only alow the move if our range does not contain an overlap
+    //Only allow the move if our range does not contain an overlap
     if (validateResult.valid) {
 
         if (row >= 0 && row < ip_GridProps[GridID].rows && toRow >= 0 && toRow < ip_GridProps[GridID].rows) {
@@ -10935,7 +10935,7 @@ function ip_MoveRow(GridID, options) {
             //Remove merges
             for (var m = 0; m < validateResult.containsMerges.merges.length; m++) { ip_ResetCellMerge(GridID, validateResult.containsMerges.merges[m].mergedWithRow, validateResult.containsMerges.merges[m].mergedWithCol); }
 
-            //Reshuffle exsting merges appropriatly
+            //Reshuffle existing merges appropriately
             if (rowDiff > 0) { ip_ReshuffelMergesRow(GridID, row, toRow + count - 1, -count, false); } //down
             else { ip_ReshuffelMergesRow(GridID, toRow, row, count, false); } //up   
 
@@ -11033,7 +11033,7 @@ function ip_ChangeFormulasForRowMove(GridID, options) {
         if (formula != newFormula) { ip_AppendEffectedRowData(GridID, Effected, { row: newFX.row, col: newFX.col, formula: newFormula }); }
     }
 
-    //SHUFFLe LIST
+    //SHUFFLE LIST
     for (var key in fxInShuffleList) {
 
         if (fxInMoveList[key] == null && ip_GridProps[GridID].indexedData.formulaData[key] != null) {
@@ -11068,7 +11068,7 @@ function ip_ShowColumnMove(GridID, col) {
         
 
 
-    //Create A move Startegy
+    //Create A move Strategy
     var MoveStrategy = [];
     var prevC = -2;
     for (var c = 0; c < ip_GridProps[GridID].selectedColumn.length; c++) {
@@ -11138,7 +11138,7 @@ function ip_ShowColumnMove(GridID, col) {
 
             if (error == '') {
 
-                //Do the actaul move
+                //Do the actual move
                 if (moveAmt > 0) { for (var m = MoveStrategy.length - 1; m >= 0; m--) { ip_MoveColumn(GridID, MoveStrategy[m]); } }
                 else { for (var m = 0; m < MoveStrategy.length; m++) { ip_MoveColumn(GridID, MoveStrategy[m]); } }
 
@@ -11177,7 +11177,7 @@ function ip_ShowRowMove(GridID, row) {
     $(RangeObjects).each(function () { this.startPos = $(this).position().top; });
 
 
-    //Create A move Startegy
+    //Create A move Strategy
     var MoveStrategy = [];
     var prevR = -2;
     for (var r = 0; r < ip_GridProps[GridID].selectedRow.length; r++) {
@@ -11245,7 +11245,7 @@ function ip_ShowRowMove(GridID, row) {
 
             if (error == '') {
 
-                //Do the actaul move
+                //Do the actual move
                 if (moveAmt > 0) { for (var m = MoveStrategy.length - 1; m >= 0; m--) { ip_MoveRow(GridID, MoveStrategy[m]); } }
                 else { for (var m = 0; m < MoveStrategy.length; m++) { ip_MoveRow(GridID, MoveStrategy[m]); } }
 
@@ -11556,7 +11556,7 @@ function ip_ResetMerge(GridID, startRow, startCol, endRow, endCol) {
             }
         }
 
-        //Clear out the indexed mergeds for row
+        //Clear out the indexed merges for row
         if (ip_GridProps[GridID].rowData[r].containsMerges != null) {
             for (var ri = ip_GridProps[GridID].rowData[r].containsMerges.length - 1; ri >= 0 ; ri--) {
 
@@ -11621,7 +11621,7 @@ function ip_SetCellMerge(GridID, rngStartRow, rngStartCol, rngEndRow, rngEndCol,
                 ip_ResetCellMerge(GridID, validateMerges.merges[m].mergedWithRow, validateMerges.merges[m].mergedWithCol);
             }
 
-            //Create the indexed merge NBNB stored by reference so ALL indexes for that merge share the same object
+            //Create the indexed merge NB stored by reference so ALL indexes for that merge share the same object
             var merge = ip_mergeObject(); 
             merge.mergedWithRow = MergeRow;
             merge.mergedWithCol = MergeCol;
@@ -11648,7 +11648,7 @@ function ip_SetCellMerge(GridID, rngStartRow, rngStartCol, rngEndRow, rngEndCol,
                     if (ip_GridProps[GridID].colData[c].containsMerges == null) { ip_GridProps[GridID].colData[c].containsMerges = new Array(); }
                     if (r == startRow) { ip_GridProps[GridID].colData[c].containsMerges[ip_GridProps[GridID].colData[c].containsMerges.length] = merge; }
 
-                    //create an instance of the merge object if we dont have one
+                    //create an instance of the merge object if we don't have one
                     if (ip_GridProps[GridID].rowData[r].cells[c].merge == null) { ip_GridProps[GridID].rowData[r].cells[c].merge = ip_mergeObject(); }
 
                     //Reset the values of the cells we merged
@@ -11673,7 +11673,7 @@ function ip_SetCellMerge(GridID, rngStartRow, rngStartCol, rngEndRow, rngEndCol,
 }
 
 function ip_ValidateFrozenMerge(GridID, rngStartRow, rngStartCol, rngEndRow, rngEndCol) {
-//Validates the range to see if spans frozen rows and scroll rows, creates independant merges and returns this
+//Validates the range to see if spans frozen rows and scroll rows, creates independent merges and returns this
 
     var arrRange = new Array();
 
@@ -12083,7 +12083,7 @@ function ip_GetRangeMergedCells(GridID, startRow, startCol, endRow, endCol) {
 
 function ip_ValidateRangeMergedCells(GridID, startRow, startCol, endRow, endCol)
 {
-    //This methods returns the merged cells within a range
+    //This method returns the merged cells within a range
 
     var Result = { containsOverlap: false, merges: new Array(), containsUnmergedCells:false, mergesIdentical: true }
     var Indexed = new Array();
@@ -12095,7 +12095,7 @@ function ip_ValidateRangeMergedCells(GridID, startRow, startCol, endRow, endCol)
 
     for (r = startRow; r <= endRow; r++)
     {
-        if (ip_GridProps[GridID].rowData[r].containsMerges != null) { //This means we do not need to seek out merges on a cell level, massivly improving performance
+        if (ip_GridProps[GridID].rowData[r].containsMerges != null) { //This means we do not need to seek out merges on a cell level, massively improving performance
 
             for (c = startCol; c <= endCol; c++) {
 
@@ -12107,11 +12107,11 @@ function ip_ValidateRangeMergedCells(GridID, startRow, startCol, endRow, endCol)
 
                     if (Indexed[IndexedKey] == null) {
 
-                        //Create a new instance of merge so we dont store it by ref
+                        //Create a new instance of merge, so we don't store it by ref
                         var newMerge = ip_mergeObject();
                         var containsOverlap = ip_DoesRangeOverlapMerge(GridID, merge, startRow, startCol, endRow, endCol);
 
-                        //Mereges found - add them to the result object (once)
+                        //Merges found - add them to the result object (once)
                         newMerge.containsOverlap = containsOverlap;
                         newMerge.mergedWithRow = merge.mergedWithRow;
                         newMerge.mergedWithCol = merge.mergedWithCol;
@@ -12199,7 +12199,7 @@ function ip_ReshuffelMergesCol(GridID, fromCol, toCol, colDiff, shuffeIndexes) {
                                 }
                             }
 
-                            //Adjust merge index (because the merge index is shared by refence - I can updated it once for all indexes (rows + cols))
+                            //Adjust merge index (because the merge index is shared by reference - I can update it once for all indexes (rows + cols))
                             ip_GridProps[GridID].colData[c].containsMerges[m].mergedWithCol = startCol + colDiff;
 
                             
@@ -12278,7 +12278,7 @@ function ip_ReshuffelMergesRow(GridID, fromRow, toRow, rowDiff, shuffeIndexes) {
                                 }
                             }
 
-                            //Adjust merge index (because the merge index is shared by refence - I can updated it once for all indexes (rows + cols))
+                            //Adjust merge index (because the merge index is shared by reference - I can update it once for all indexes (rows + cols))
                             ip_GridProps[GridID].rowData[r].containsMerges[m].mergedWithRow = startRow + rowDiff;
                             delete ip_GridProps[GridID].mergeData[mi];
 
@@ -12446,7 +12446,7 @@ function ip_MergedHeight(GridID, row, col) {
 
 function ip_ReRender(GridID) {
    
-    //This is a temporary rerender algorythm, we want to come up with a faster one later but it will do for now
+    //This is a temporary rerender algorithm, we want to come up with a faster one later, but it will do for now
     ip_RecalculateLoadedRowsCols(GridID, false, true, true);
     ip_ReRenderCols(GridID);
     ip_ShowColumnFrozenHandle(GridID, true);
@@ -12592,7 +12592,7 @@ function ip_ReRenderRanges(GridID, ranges, loadedScrollable, InclColumnHeaders) 
 }
 
 function ip_ReRenderCols(GridID, Quad) {
-    //Redraws all columns in specifc quads
+    //Redraws all columns in specific quads
 
     if (Quad == null) { Quad = 'all';  }
 
@@ -12640,7 +12640,7 @@ function ip_ReRenderCols(GridID, Quad) {
 
 function ip_ReRenderRows(GridID, Quad) {
 
-    //Redraws rows in specifc quads
+    //Redraws rows in specific quads
     if (Quad == null) { Quad = 'all';  }
 
     if ((Quad == 'all' || Quad == 'frozen')) {
@@ -12900,7 +12900,7 @@ function ip_OptimzeLoadedRows(GridID) {
 
     var LoadedRowsCols = ip_LoadedRowsCols(GridID, false, true, false);
 
-    //Full in any extra rows as a result of maing rows small            
+    //Full in any extra rows as a result of main rows small
     var AddRow = LoadedRowsCols.rowTo_scroll + 1;
     while (ip_GridProps[GridID].dimensions.accumulativeScrollHeight < ip_GridProps[GridID].dimensions.scrollHeight && AddRow < ip_GridProps[GridID].rows) {
         ip_GridProps[GridID].loadedRows++;
@@ -12908,7 +12908,7 @@ function ip_OptimzeLoadedRows(GridID) {
         AddRow++;
     }
 
-    //Remove any extra cols as a result of maing cols large 
+    //Remove any extra cols as a result of main cols large
     var RemoveRow = LoadedRowsCols.rowTo_scroll;
     while (ip_GridProps[GridID].dimensions.accumulativeScrollHeight - ip_RowHeight(GridID, RemoveRow, true) > ip_GridProps[GridID].dimensions.scrollHeight && RemoveRow > ip_GridProps[GridID].frozenRows) {
 
@@ -12924,7 +12924,7 @@ function ip_OptimizeLoadedCols(GridID) {
 
     var LoadedRowsCols = ip_LoadedRowsCols(GridID, false, false, true);
 
-    //Full in any extra cols as a result of maing cols small            
+    //Full in any extra cols as a result of main cols small
     var AddCol = LoadedRowsCols.colTo_scroll + 1;
     while (ip_GridProps[GridID].dimensions.accumulativeScrollWidth < ip_GridProps[GridID].dimensions.scrollWidth && AddCol < ip_GridProps[GridID].cols) {
         ip_GridProps[GridID].loadedCols++;
@@ -12932,7 +12932,7 @@ function ip_OptimizeLoadedCols(GridID) {
         AddCol++;
     }
 
-    //Remove any extra cols as a result of maing cols large 
+    //Remove any extra cols as a result of main cols large
     var RemoveCol = LoadedRowsCols.colTo_scroll;
     while (ip_GridProps[GridID].dimensions.accumulativeScrollWidth - ip_ColWidth(GridID, RemoveCol, true) > ip_GridProps[GridID].dimensions.scrollWidth && RemoveCol > ip_GridProps[GridID].frozenCols) {
 
@@ -12949,7 +12949,7 @@ function ip_OptimizeLoadedCols(GridID) {
 function ip_CellDataType(GridID, row, col, adviseDefault, value, oldMask) {
 
     // Tests cell value and returns the cell dataType.
-    // adviseDefault: returns the columns data type if the cells datatype is null
+    // adviseDefault: returns the column's data type if the cells datatype is null
     // value: lets you override the test for cells current value with a potential future value
     var OldMask = oldMask;
     var Mask = ip_GetMaskObj(GridID, row, col, adviseDefault);
@@ -13026,10 +13026,10 @@ function ip_CellDataType(GridID, row, col, adviseDefault, value, oldMask) {
             }
             else if ((DataType.expectedDataType.dataType == 'default')) {
 
-                //If we made it this far and the value is null we cannot parse it so we dont know what it is, so assume text
+                //If we made it this far and the value is null we cannot parse it so we don't know what it is, so assume text
                 if (DataType.value == null) { DataType.dataType.dataType = 'text'; DataType.value = ''; DataType.valid = true; }
                 else {
-                    //Determine the UKNOWN datatype of the cell                
+                    //Determine the UNKNOWN datatype of the cell
                     DataType.value = ip_parseAny(GridID, DataType.value);
                     DataType.dataType.dataType = typeof (DataType.value);
 
@@ -13153,7 +13153,7 @@ function ip_CellData(GridID, row, col, withControls) {
 }
 
 function ip_CellInput(GridID, options) {
-    //Sets cellvalue for indevidual cells for any array of ranges, syncing indevidual cells with the server
+    //Sets cell value for individual cells for any array of ranges, syncing individual cells with the server
 
     var options = $.extend({
           
@@ -13240,7 +13240,7 @@ function ip_CellInput(GridID, options) {
 
         }
         else if(Effected.rowData.length > 0) {
-            //Raise event for multple one cells
+            //Raise event for multiple cells
  
             if (options.render) { ip_ReRenderCells(GridID, Effected.rowData); }
 
@@ -13298,8 +13298,8 @@ function ip_SetValue(GridID, row, col, value, oldMask) {
 
 function ip_SetCellFormat(GridID, options) {
     //This is physically different to SetCellValue because it accepts formatting options and applies it to the entire range, this single value for the entire range then syncs
-    //this offers more performance, but has the limitation of not being able to update indevidual rowdata/celldata with the server
-    //If indevidual row/cell data is required, SetCellValue should be used rather.
+    //this offers more performance, but has the limitation of not being able to update individual rowdata/celldata with the server
+    //If individual row/cell data is required, SetCellValue should be used rather.
     var options = $.extend({
 
         transactionID: ip_GenerateTransactionID(),
@@ -13502,7 +13502,7 @@ function ip_SetCellFormat(GridID, options) {
         //ReRender
         if (options.render) { ip_ReRenderRanges(GridID, options.range, null, PropertyAppendModes.colnotnull); }
 
-        //Raise cell change event - server module should automatically handle the queing of the data types
+        //Raise cell change event - server module should automatically handle the queueing of the data types
         if (options.raiseEvent && Effected.range.length > 0) { ip_RaiseEvent(GridID, 'ip_FormatCell', TransactionID, { CellFormat: { Inputs: options, Effected: Effected } }); }
 
         return formatObject;
@@ -13598,7 +13598,7 @@ function ip_SetCellControlType(GridID, row, col) {
 
 function ip_GetCellControlType(GridID, formula, fxIndex, row, col) {
 
-    //Looks at the formula and deciceds what the the cells control type
+    //Looks at the formula and decides what the cells control type
     //Rules for control type: the formula must be explicit and singular, so e.g. 'dropdown(a1:a10) + a1' will not be converted, but 'dropdown(a1:a10)' will be
     
     if (GridID != null && (formula != null || fxIndex != null)) {
@@ -13761,7 +13761,7 @@ function ip_RemoveCellFormulaIndex(GridID, options) {
 
 function ip_ReCalculateFormulas(GridID, options) {
 
-    //Triggers the formulas linked to this range to be recaculated
+    //Triggers the formulas linked to this range to be recalculated
 
     var options = $.extend({
 
@@ -13814,7 +13814,7 @@ function ip_ReCalculateFormulas(GridID, options) {
 
                     if (options.level == 100) {
                         ip_SetValue(GridID, row, col, "#ERROR");
-                        ip_GridProps[GridID].rowData[row].cells[col].error = ip_errorObject('2', 'Circular dependancy detected');                        
+                        ip_GridProps[GridID].rowData[row].cells[col].error = ip_errorObject('2', 'Circular dependency detected');
                         return { Effected: Effected, fxDone: fxDone }
                     }
 
@@ -13886,8 +13886,8 @@ function ip_ReCalculateFormulas(GridID, options) {
 
 function ip_ChangeFormulaOrigin(GridID, options) {
 
-    //Moves formula indexes from a range to a new range, usefull for move row, col -
-    //NB unless changeFormula is set to true, does not change the formula - just its origon and points its indexes
+    //Moves formula indexes from a range to a new range, useful for move row, col -
+    //NB unless changeFormula is set to true, does not change the formula - just its origin and points its indexes
 
     var options = $.extend({
 
@@ -13955,7 +13955,7 @@ function ip_ChangeFormulaOrigin(GridID, options) {
 function ip_MoveFormulaOrigon(GridID, formula, fromRow, fromCol, toRow, toCol, exlcudeIfInRange, includeIfInRange, rowIncrement, colIncrement, incrementRange, selectedRange) {
 
     //Changes a formula by working out the difference in change and moving it to a new location
-    //wont change the indevidual range if it overlaps exlcudeIfInRange
+    //won't change the individual range if it overlaps exlcudeIfInRange
     if (formula != null && fromRow != null && fromCol != null && toRow != null && toCol != null) {
 
         var rowInc = toRow - fromRow;
@@ -14006,7 +14006,7 @@ function ip_ChangeFormulasForCellMove(GridID, CellUndoData, fromRow, fromCol, to
 
     if (GridID == null || fromRow == null && fromCol == null && toRow == null && toCol == null) { return }
     
-    //Update linked cell formuals
+    //Update linked cell formulas
     var fxInRangeXX = ip_FormulasInRange(GridID, ip_rangeObject(fromRow, fromCol, fromRow, fromCol), true, true);
     for (var key in fxInRangeXX) {
         
@@ -14031,7 +14031,7 @@ function ip_ChangeFormulasForCellMove(GridID, CellUndoData, fromRow, fromCol, to
 function ip_FormulasInRange(GridID, range, sources, linkIndexes) {
 
     //Fetches formulas within the specified range.
-    //If sources, then looks for formulas which origonate in that range
+    //If sources, then looks for formulas which originate in that range
     //If linkIndex, then looks for cells that are linked to the formula
 
     var FXList = {};
@@ -14058,7 +14058,7 @@ function ip_FormulasInRange(GridID, range, sources, linkIndexes) {
         }
         else
         {
-            //Iterate through all the indexex formulas we have
+            //Iterate through all the indexed formulas we have
             for (var key in ip_GridProps[GridID].indexedData.formulaData) {
 
                 var fx = ip_GridProps[GridID].indexedData.formulaData[key];
@@ -14361,7 +14361,7 @@ function ip_EnabledFormats(GridID, options)
     var options = $.extend({
                 
         range: null, // [{ startRow:null, startCol: null, endRow: null, endCol: null }],    
-        maxCells: 1000, //Because this is resource intensive, this wont get properties for ranges bigger than this
+        maxCells: 1000, //Because this is resource intensive, this won't get properties for ranges bigger than this
         getStyle: true,
         getDataType: false,
         getControlType: false,
@@ -14413,7 +14413,7 @@ function ip_EnabledFormats(GridID, options)
 
                     cellCount++;
 
-                    //Reteive formatting relating to style
+                    //Retrieve formatting relating to style
                     if (options.getStyle) {
 
                         formatObject = ip_GetEnabledFormats(GridID, formatObject, r, c);
@@ -14422,7 +14422,7 @@ function ip_EnabledFormats(GridID, options)
 
                     }
                     
-                    //Retreive formatting relating to datatype
+                    //Retrieve formatting relating to datatype
                     if(options.getDataType){ ip_GetEnabledDataType(GridID, formatObject, r, c, options.adviseDefault); }
                     if (options.getControlType) { ip_GetEnabledControlType(GridID, formatObject, r, c, options.adviseDefault); }
                     if (options.getValidation) { ip_GetEnabledValidation(GridID, formatObject, r, c, options.adviseDefault); }
@@ -14985,7 +14985,7 @@ function ip_EditToolShowDropDown(GridID, editTool, dropDownData) {
 
             });
 
-            //Select a drop down item
+            //Select a dropdown item
             ip_UnBindEvent(dropDownItems, 'click', ip_GridProps[GridID].events.textEditToolDropdown_Click);
             $(dropDownItems).click(ip_GridProps[GridID].events.textEditToolDropdown_Click = function (e) {
 
@@ -15375,9 +15375,9 @@ function ip_fxValue(GridID, formula, row, col) {
 
 function ip_fxObject(GridID, formula, row, col, cursorI) {
     
-    //Accepts a forumla string and returns it in a structured fx object
+    //Accepts a formula string and returns it in a structured fx object
     //e.g. '=sum(A1,A2,A3) + 25 * A3'
-    //Will break the formula for analysis up to cursorI -> this resource intensive leave out cursor I if analysis is not needed
+    //Will break the formula for analysis up to cursorI -> this resource intensive leave out cursor if analysis is not needed
 
     if (formula == null || formula == '' || formula[0] != '=') { return false; }
 
@@ -15655,7 +15655,7 @@ function ip_fxRange(GridID, row, col, fxRanges) {
     //returns the first values in a range
     //fxRanges is an array of ranges e.g. ip_rangeObject and determines the collective value
 
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'range', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'range', row, col); }
 
     var value = '';
     var type = '';
@@ -15687,7 +15687,7 @@ function ip_fxCount(GridID, row, col, fxRanges) {
 
     //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number, and counts the number of cells in range containing numeric values
 
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'count', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'count', row, col); }
 
     var value = 0;
     var type = '';
@@ -15733,8 +15733,8 @@ function ip_fxCount(GridID, row, col, fxRanges) {
 
 function ip_fxSum(GridID, row, col, fxRanges) {
     
-    //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number, and sums up the numebers in that range, ignoring other datatypes
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'sum', row, col); }
+    //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number, and sums up the numbers in that range, ignoring other datatypes
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'sum', row, col); }
 
     var tmp = null;
     var value = 0;
@@ -15786,7 +15786,7 @@ function ip_fxConcat(GridID, row, col,  fxRanges) {
 
 
     //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'concat', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'concat', row, col); }
 
     var value = '';
     var type = '';
@@ -15837,7 +15837,7 @@ function ip_fxConcat(GridID, row, col,  fxRanges) {
 function ip_fxDropDown(GridID, row, col, fxRanges) {
 
     //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'dropdown', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'dropdown', row, col); }
 
 
     var data = { displayField: 'displayField', data: [], toString: function () { return null; }  }
@@ -15895,7 +15895,7 @@ function ip_fxDropDown(GridID, row, col, fxRanges) {
 function ip_fxGantt(GridID, row, col, fxInputs) {
 
     //fxInputs is an array with 5 inputs: BaseDate, StartDate, EndDate, TaskName, ProjectName (optional)
-    if (arguments.length < 6) { throw ip_fxException('1', "Missing input paramiters", 'gantt', row, col); }
+    if (arguments.length < 6) { throw ip_fxException('1', "Missing input parameters", 'gantt', row, col); }
 
     var data = false;
 
@@ -15956,7 +15956,7 @@ function ip_fxMax(GridID, row, col, fxRanges) {
 
     //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number, and counts the number of cells in range containing numeric values
 
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'max', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'max', row, col); }
 
     var value = null;
     var type = '';
@@ -16005,7 +16005,7 @@ function ip_fxMax(GridID, row, col, fxRanges) {
 
 function ip_fxToday(GridID,  row, col, increment) {
 
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'today', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'today', row, col); }
 
     GridID = arguments[0];
     row = arguments[1];
@@ -16029,7 +16029,7 @@ function ip_fxToday(GridID,  row, col, increment) {
 
 function ip_fxDate(GridID,  row, col, increment) {
 
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'date', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'date', row, col); }
 
     GridID = arguments[0];
     row = arguments[1];
@@ -16053,7 +16053,7 @@ function ip_fxDate(GridID,  row, col, increment) {
 
 function ip_fxDay(GridID, row, col, increment) {
 
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input paramiters", 'day', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'day', row, col); }
 
     GridID = arguments[0];
     row = arguments[1];
@@ -16094,7 +16094,7 @@ function ip_TableWidth(TableID) {
 
     }
 
-    //Adjust correct width based on browser (ie returns stlye width, crome etc return real width
+    //Adjust correct width based on browser (ie returns style width, chrome etc. return real width
     if (TableWidth > CellsWidth) { RealWidth = TableWidth; }
     else { RealWidth = CellsWidth + TableWidth; }
     
@@ -16326,7 +16326,7 @@ function ip_LoadedRowsCols(GridID, loadVisualRepresentation, rows, cols) {
         loaded.colTo_scroll = loaded.colFrom_scroll + loaded.colCount_scroll - 1;
     }
 
-    //Turned off by default for performance reasons only used in special situations when absolutely nessisary
+    //Turned off by default for performance reasons only used in special situations when absolutely necessary
     if (loadVisualRepresentation) {
 
         var table = null;
@@ -16704,7 +16704,7 @@ function ip_AddUndo(GridID, Method, TransactionID, TransactionType, Range, Rever
         var undoStackSize = Object.keys(ip_GridProps[GridID].undo.undoStack).length;
         var MaxUndoTransaction = undoStackSize;
 
-        //Remove older transactions from the undo stack tranactions
+        //Remove older transactions from the undo stack transactions
         if (undoStackSize >= ip_GridProps[GridID].undo.maxTransactions) {  MaxUndoTransaction = ip_TrimUndoStack(GridID) + 1;  }
 
         ip_GridProps[GridID].undo.undoStack[TransactionID] = {
@@ -16757,16 +16757,16 @@ function ip_AddUndoTransactionData(GridID, UndoTransaction, Data) {
 }
 
 function ip_UndoTransaction(GridID, TransactionID, SelectRanges, ReRender) {
-    //Performs the undo transction, the following is supported: CellData, MergeData
+    //Performs the undo transaction, the following is supported: CellData, MergeData
     //TransactionID: ID of undo transaction to execute
     //ReRender: redraw the grid after the undo
 
-    //IMPORTAINT TO NOTE:
-    //CellData: does not effect merges (use Merge data for that)
-    //ColData: does not effect merges (use Merge data for that)
-    //RowData: does not effect cells or merges (use CellData / MergeData for that)
-    //MergeData: will change the marges within a range, however will not affect merges that overlap the range 
-    //undoServer: undo can only take plase on the server, this will cause resync to be set to true
+    //IMPORTANT TO NOTE:
+    //CellData: does not affect merges (use Merge data for that)
+    //ColData: does not affect merges (use Merge data for that)
+    //RowData: does not affect cells or merges (use CellData / MergeData for that)
+    //MergeData: will change the merges within a range, however will not affect merges that overlap the range
+    //undoServer: undo can only take place on the server, this will cause resync to be set to true
 
     var result = { success: false, rowDataLoading: false, method: '' }
 
@@ -16922,7 +16922,7 @@ function ip_UndoTransaction(GridID, TransactionID, SelectRanges, ReRender) {
 
 function ip_TrimUndoStack(GridID) {
 
-    //Taking a chance with this code - because though its faster, it may not work properly with all javascript implementations
+    //Taking a chance with this code - because though it's faster, it may not work properly with all javascript implementations
     //var MinTransactionID = Object.keys(ip_GridProps[GridID].undo.undoStack)[0];
     //var MaxTransactionID = Object.keys(ip_GridProps[GridID].undo.undoStack)[Object.keys(ip_GridProps[GridID].undo.undoStack).length - 1];
     //var MaxTransactionSeq = ip_GridProps[GridID].undo.undoStack[MaxTransactionID].transactionSeq;
@@ -16935,7 +16935,7 @@ function ip_TrimUndoStack(GridID) {
     var MaxTransactionID = '';
 
 
-    //Buld an array of the undo stack so we can sort it
+    //Build an array of the undo stack, so we can sort it
     for (var key in ip_GridProps[GridID].undo.undoStack) {
 
         var TransactionSeq = ip_GridProps[GridID].undo.undoStack[key].transactionSeq;
@@ -17270,7 +17270,7 @@ function ip_parseCurrency(value, decimals) {
     var processedVal = value;
 
     if (typeof (value) == 'string') {
-        var processedVal = value.replace(/[$R]/gi, ''); //all symboles for currency    
+        var processedVal = value.replace(/[$R]/gi, ''); //all symbols for currency
         if (processedVal.match(/[^.0-9]/)) { return NaN }
     }
 
@@ -17948,7 +17948,7 @@ function ip_ShowFooterAlert(Title, Message, Icon, BackColor, Duration) {
 
 
 
-//----- 3rd party dependancies ------------------------------------------------------------------------------------------------------------------------------------
+//----- 3rd party dependencies ------------------------------------------------------------------------------------------------------------------------------------
 
 //----- MOUSEWHEEL ------------------------------------------------------------------------------------------------------------------------------------
 
