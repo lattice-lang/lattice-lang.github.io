@@ -6635,6 +6635,7 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'today', functionName: 'ip_fxToday', tip: 'Returns current date', inputs: '(increment in days)', example: '<br/>today( 0 )<br/>today( -1 )<br/>today( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'date', functionName: 'ip_fxDate', tip: 'Returns the current date', inputs: '(increment in days)', example: '<br/>date( 0 )<br/>date( -1 )<br/>date( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'day', functionName: 'ip_fxDay', tip: 'Returns the calendar day in month', inputs: '(increment in days)', example: '<br/>day( 0 )<br/>day( -1 )<br/>day( 1 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'if', functionName: 'ip_fxIf', tip: 'Returns one value if a logical expression is \'TRUE\' and another if it is \'FALSE\'.', inputs: '(logical_expression, value_if_true, value_if_false)', example: 'if(A2,\'A2 was true\',\'A2 was false\')' });
 
 }
 
@@ -15594,7 +15595,15 @@ function ip_fxCalculate(GridID, fxString, row, col) {
         ip_fxValidate(GridID, fxString, row, col);
 
         fxString = fxString.replace(rxRootRanges, function (arg) { return 'ip_fxRange("' + GridID + '",' + row + ',' + col + ',"' + arg + '")'; }); //regular expression to replace ranges with quotes
-        fxString = fxString.replace(ip_GridProps['index'].regEx.range, function (arg) { return 'ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '")'; });
+
+        //if fxString starts with 'if(...)', then coordinates are replaced with function calls to get their respective values
+        //e.g. A0 -> ip_CellDataType(GridID,ip_fxRangeObject(GridID,row,col,"a0").startRow,ip_fxRangeObject(GridID,row,col,"a0").startCol,true).value
+        if ( fxString.startsWith("if(") ) {
+            fxString = fxString.replace(ip_GridProps['index'].regEx.range, function (arg) { return 'ip_CellDataType("' + GridID + '",ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '").startRow,ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '").startCol,true).value'; });
+        }
+        else {
+            fxString = fxString.replace(ip_GridProps['index'].regEx.range, function (arg) { return 'ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '")'; });
+        }
 
         for (var key in ip_GridProps[GridID].fxList) {
                         
@@ -16072,6 +16081,46 @@ function ip_fxDay(GridID, row, col, increment) {
     }
 
     return new Date(new Date().valueOf() + 86400000 * increment).getUTCDate();
+
+}
+
+function ip_fxIf(GridID, row, col, fxRanges) {
+
+    //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number
+    //ip_fxIf returns one value if a logical expression is 'TRUE' and another if it is 'FALSE'
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'if', row, col); }
+
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+    //result of if-statement evaluation
+    var result = null;
+
+    //if-function arguments must specify the logical expression, and the value if it's true
+    if (fxRanges.length < 2) { throw ip_fxException('1', "provide at least 2 parameters: logical expression, value_if_true", 'if', row, col); }
+    //if-function arguments must specify the logical expression, the value if it's true, and an optional value if it's false
+    if (fxRanges.length > 3) { throw ip_fxException('1', "provide a maximum of 3 parameters: logical expression, value_if_true, value_if_false (optional)", 'if', row, col); }
+
+    //if-function's condition that is true or false
+    var logicalExp = fxRanges[0];
+    //value_if_true
+    var trueValue = fxRanges[1];
+
+    if (eval(logicalExp)) {
+
+        result = trueValue;
+    }
+    else {
+        if (fxRanges.length == 3) {
+
+            //value_if_false (optional)
+            result = fxRanges[2];
+        }
+    }
+
+    return result;
 
 }
 
