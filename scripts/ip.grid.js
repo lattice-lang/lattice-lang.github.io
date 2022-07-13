@@ -4837,6 +4837,7 @@ var thisBrowser = ip_Browser();
             hoverRowIndex: null,
             fxBar: null, //formula bar element to use - may be a custom fbar element
             fxList: {},
+            lambdaList: {}, //contains a list of active lambda functions and their respective coordinates
             selectedCell: null, //td cell object
             selectedColumn: new Array(), //Array of column indexes
             selectedRow: new Array(), //Array of row indexes
@@ -6636,6 +6637,7 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'date', functionName: 'ip_fxDate', tip: 'Returns the current date', inputs: '(increment in days)', example: '<br/>date( 0 )<br/>date( -1 )<br/>date( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'day', functionName: 'ip_fxDay', tip: 'Returns the calendar day in month', inputs: '(increment in days)', example: '<br/>day( 0 )<br/>day( -1 )<br/>day( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'if', functionName: 'ip_fxIf', tip: 'Returns one value if a logical expression is \'TRUE\' and another if it is \'FALSE\'.', inputs: '(logical_expression, value_if_true, value_if_false)', example: 'if(A2,\'A2 was true\',\'A2 was false\')' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'lambda', functionName: 'ip_fxLambda', tip: 'Defines a lambda function, based on the given arguments.', inputs: '( arg_range, body_range, return_cell)', example: 'lambda( a1, b1:b5, a3 )' });
 
 }
 
@@ -15594,6 +15596,8 @@ function ip_fxCalculate(GridID, fxString, row, col) {
         
         ip_fxValidate(GridID, fxString, row, col);
 
+        fxString = ip_ReplaceCellCall(fxString); //replace cell call with an underscore notation ( e.g. 'A0(' -> 'A_0(' )
+
         fxString = fxString.replace(rxRootRanges, function (arg) { return 'ip_fxRange("' + GridID + '",' + row + ',' + col + ',"' + arg + '")'; }); //regular expression to replace ranges with quotes
 
         //if fxString starts with 'if(...)', then coordinates are replaced with function calls to get their respective values
@@ -15603,6 +15607,14 @@ function ip_fxCalculate(GridID, fxString, row, col) {
         }
         else {
             fxString = fxString.replace(ip_GridProps['index'].regEx.range, function (arg) { return 'ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '")'; });
+        }
+
+        //check lambdaList for a registered lambda function based on a coordinate
+        for (var key in ip_GridProps[GridID].lambdaList) {
+
+            fxString = fxString.replace(new RegExp('\\b' + key + '\\(\\)', 'gi'), 'ip_GridProps[GridID].lambdaList["' + key + '"]("'+ GridID + '",' + row + ',' + col + ')');
+            fxString = fxString.replace(new RegExp('\\b' + key + '\\(', 'gi'), 'ip_GridProps[GridID].lambdaList["' + key + '"]("'+ GridID + '",' + row + ',' + col + ',');
+
         }
 
         for (var key in ip_GridProps[GridID].fxList) {
@@ -15619,6 +15631,14 @@ function ip_fxCalculate(GridID, fxString, row, col) {
         else { return ip_fxException(1, ex.message, 'eval', row, col); }
     }
 
+}
+
+function ip_ReplaceCellCall(fxString) {
+    // function to replace cell notation (e.g.A0) with col_row string (e.g.A_0)
+    var pattern = /([$0-9]+)(?=\()/gi;
+    fxString = fxString.replace(pattern, "_$&"); //regular expression to replace ranges with quotes
+
+    return fxString;
 }
 
 function ip_fxValidate(GridID, fxString, row, col) {
@@ -16122,6 +16142,159 @@ function ip_fxIf(GridID, row, col, fxRanges) {
 
     return result;
 
+}
+
+function ip_fxLambda(GridID, row, col,  fxRanges) {
+
+    //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'lambda', row, col); }
+
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+    //lambda function definition must specify the arguments, body, and a return cell
+    if (fxRanges.length != 3) { throw ip_fxException('1', "provide exactly 3 parameters: args-range, body-range, return-cell", 'lambda', row, col); }
+
+    //user defined formula for a lambda function
+    var formulaString = "=lambda(";
+
+    //parameters of the lambda function (0 - args, 1 - body, 2 - return cell)
+    //rebuild the formula text written by the user
+    for (var i = 0; i < fxRanges.length; i++) {
+
+        if (typeof (fxRanges[i]) == 'object') {
+
+            var range = fxRanges[i];
+            if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+            var rangeString = '';
+            //if the current range is the return cell, then add only the starting coordinate of the range
+            if (i==fxRanges.length-1) {
+                rangeString = ip_ColumnSymboldCharCode(range.startCol) + range.startRow;
+            } else {
+                rangeString = ip_ColumnSymboldCharCode(range.startCol) + range.startRow + ":" + ip_ColumnSymboldCharCode(range.endCol) + range.endRow;
+            }
+            formulaString += rangeString + ",";
+        }
+        else { throw ip_fxException('1', "Inputs are incorrect, they must be ranges", 'lambda', row, col); }
+
+    }
+
+    formulaString = formulaString.slice(0, -1) + ")"; //reconstruct the original user defined formula string
+
+    //the coordinate of the cell that holds the lambda definition in the underscore notation (e.g. A_0)
+    var lambdaCoord = ip_ColumnSymboldCharCode(col) + '_' + row;
+
+    //function constructed from the lambda definition
+    var func = ip_BuildLambdaFunc(fxRanges);
+
+    //store the function that is callable using the lambda coordinate in a list of lambdas
+    ip_GridProps[GridID].lambdaList[lambdaCoord] = func;
+
+    return formulaString;
+
+}
+
+function ip_BuildLambdaFunc(lambdaParams) {
+
+    var argsRange = lambdaParams[0];
+    var bodyRange = lambdaParams[1];
+    var returnCell = lambdaParams[2];
+
+    var func = function(GridID, row, col, fxRanges){
+
+        //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number
+        if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'lambda', row, col); }
+
+        var tmp = null;
+        //array of values created from the arguments passed to the lambda
+        var values = [];
+        //result produced by the lambda function
+        var result = null;
+        //pattern to identify formulas
+        //var pattern = "'=";
+
+        GridID = arguments[0];
+        row = arguments[1];
+        col = arguments[2];
+        fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+        //loop over the arguments passed to the lambda
+        for (var i = 0; i  < fxRanges.length; i ++) {
+
+            //if the argument is a range (or a single coordinate)
+            if (typeof(fxRanges[i]) == 'object') {
+
+                var range = fxRanges[i];
+
+                if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+
+                for (var r = range.startRow; r <= range.endRow; r++) {
+
+                    if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'lambda', row, col); }
+
+                    for (var c = range.startCol; c <= range.endCol; c++) {
+
+                        if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'lambda', row, col); }
+
+                        var val = ip_CellDataType(GridID, r, c, true);
+
+                        if (val.value != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+                            //add the value of a cell to the values array
+                            if (!isNaN(parseFloat(val.value))) { values.push(parseFloat(val.value)); }
+                        }
+
+                    }
+
+                }
+
+            }
+            //if the argument is a number
+            else if (typeof (tmp = ip_fxCalculate(GridID, fxRanges[i])) == 'number') { values.push(tmp); }
+            else if (!isNaN(parseFloat(fxRanges[i]))) { values.push(parseFloat(fxRanges[i])); }
+            else { throw ip_fxException('1', "Inputs are incorrect, they must be numbers or ranges", 'lambda', row, col); }
+
+        }
+
+        var j = 0;
+        //loop over the argument range declared by the lambda
+        for (var ar = argsRange.startRow; ar <= argsRange.endRow; ar++) {
+
+            if (ip_GridProps[GridID].rowData[ar].loading) { throw ip_fxException('1', 'Row data not loaded', 'lambda', row, col); }
+
+            for (var ac = argsRange.startCol; ac <= argsRange.endCol; ac++) {
+                ip_SetValue(GridID, ar, ac, undefined); //reset the args values
+                //copy the values passed to the lambda into the declared argument range
+                ip_SetValue(GridID, ar, ac, values[j]);
+                j++;
+            }
+        }
+
+
+        //loop over the body range declared by the lambda
+        for (var br = bodyRange.startRow; br <= bodyRange.endRow; br++) {
+
+            if (ip_GridProps[GridID].rowData[br].loading) { throw ip_fxException('1', 'Row data not loaded', 'lambda', row, col); }
+
+            for (var bc = bodyRange.startCol; bc <= bodyRange.endCol; bc++) {
+                //get the formula of a body cell
+                var cellFormula = ip_GridProps[GridID].rowData[br].cells[bc].formula;
+                //if cellFormula is not undefined, calculate the formula with given values
+                if (cellFormula != undefined) {
+                    var cellValue = ip_fxCalculate(GridID, cellFormula.replace("=", ""));
+                    ip_SetValue(GridID, br, bc, cellValue);
+                }
+            }
+        }
+
+        //get the value of return cell
+        result = ip_CellDataType(GridID, returnCell.startRow, returnCell.startCol, true).value;
+
+        return result;
+    };
+
+    return func;
 }
 
 
