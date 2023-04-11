@@ -6629,6 +6629,8 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'range', functionName: 'ip_fxRange', tip: 'Specifies a range of cells, by default the first cell in range is returned.', inputs: '[row][col]:[row][col]', example: 'A1 or A1:B5' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'count', functionName: 'ip_fxCount', tip: 'Counts the number of cells which have numeric values. Ignores cells that are empty or text.', inputs: '(range1, range2, ... )', example: 'count( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'sum', functionName: 'ip_fxSum', tip: 'Adds the numbers in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'sum( a1, b1:b5, a3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'head', functionName: 'ip_fxHead', tip: 'Returns the leftmost character of a string', inputs: '( range1 )', example: 'head("mystring") -> "m"' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'tail', functionName: 'ip_fxTail', tip: 'Returns the tail of the string (right substring after first character)', inputs: '( range1 )', example: 'tail("mystring") -> "ystring"' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'concat', functionName: 'ip_fxConcat', tip: 'Joins the values of cells into one text string.', inputs: '( range1, range2, ... )', example: 'concat( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'dropdown', functionName: 'ip_fxDropDown', tip: 'Fetches a range and returns the values as a dropdown object', inputs: '( range1, range2, ... )', example: 'dropdown( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'gantt', functionName: 'ip_fxGantt', tip: 'Returns true or false if the base date falls within start and end date ranges', inputs: '( BaseDate, StartDate, EndDate, TaskName, ProjectName (optional) )', example: '<br/>gantt( 2014-07-15, 2014-07-01, 2014-07-31, Cost of sales report, General Management )<br/>gantt( today(0), a1, a2, Cost of sales report, General Management )' });
@@ -15843,6 +15845,109 @@ function ip_fxConcat(GridID, row, col,  fxRanges) {
                     var val = ip_CellDataType(GridID, r, c, true);
                     if (val.display != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
                         if (val.display != null) { value += String(val.display); }
+                        if (value.length == 500) { break; }
+                    }
+
+                    
+
+                }
+
+            }
+
+        }
+        else if (fxRanges[i] != null) { value += fxRanges[i]; }
+
+    }
+
+    if (value.length > 500) { value = value.substr(0, 500); }
+
+    return value;
+
+}
+
+function ip_fxHead(GridID, row, col,  fxRanges) {
+
+
+    //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'concat', row, col); }
+
+    var value = '';
+    var type = '';
+
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+    
+    for (var i = 0; i < fxRanges.length; i++) {
+
+        if (typeof (fxRanges[i]) == 'object') {
+
+            var range = fxRanges[i];
+            if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+
+            for (var r = range.startRow; r <= range.endRow; r++) {
+
+                if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'range', row, col); }
+
+                for (var c = range.startCol; c <= range.endCol; c++) {
+
+                    if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'concat', row, col); }
+                    
+                    var val = ip_CellDataType(GridID, r, c, true);
+                    if (val.display != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+                        if (val.display != null) { value =  String(val.display).slice(0,1); }
+                        if (value.length == 500) { break; }
+                    }
+
+                    
+
+                }
+
+            }
+
+        }
+        else if (fxRanges[i] != null) { value += fxRanges[i]; }
+
+    }
+
+    if (value.length > 500) { value = value.substr(0, 500); }    return value;
+
+}
+
+
+function ip_fxTail(GridID, row, col,  fxRanges) {
+
+
+    //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'concat', row, col); }
+
+    var value = '';
+    var type = '';
+
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+    
+    for (var i = 0; i < fxRanges.length; i++) {
+
+        if (typeof (fxRanges[i]) == 'object') {
+
+            var range = fxRanges[i];
+            if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+
+            for (var r = range.startRow; r <= range.endRow; r++) {
+
+                if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'range', row, col); }
+
+                for (var c = range.startCol; c <= range.endCol; c++) {
+
+                    if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'concat', row, col); }
+                    
+                    var val = ip_CellDataType(GridID, r, c, true);
+                    if (val.display != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+                        if (val.display != null) { value =  String(val.display).slice(1); }
                         if (value.length == 500) { break; }
                     }
 
