@@ -6634,7 +6634,8 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'concat', functionName: 'ip_fxConcat', tip: 'Joins the values of cells into one text string.', inputs: '( range1, range2, ... )', example: 'concat( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'dropdown', functionName: 'ip_fxDropDown', tip: 'Fetches a range and returns the values as a dropdown object', inputs: '( range1, range2, ... )', example: 'dropdown( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'gantt', functionName: 'ip_fxGantt', tip: 'Returns true or false if the base date falls within start and end date ranges', inputs: '( BaseDate, StartDate, EndDate, TaskName, ProjectName (optional) )', example: '<br/>gantt( 2014-07-15, 2014-07-01, 2014-07-31, Cost of sales report, General Management )<br/>gantt( today(0), a1, a2, Cost of sales report, General Management )' });
-    $('#' + GridID).ip_AddFormula({ formulaName: 'max', functionName: 'ip_fxMax', tip: 'Returns the largest number in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'sum( a1, b1:b5, a3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'max', functionName: 'ip_fxMax', tip: 'Returns the largest number in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'max( a1, b1:b5, a3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'min', functionName: 'ip_fxMin', tip: 'Returns the smallest number in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'min( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'today', functionName: 'ip_fxToday', tip: 'Returns current date', inputs: '(increment in days)', example: '<br/>today( 0 )<br/>today( -1 )<br/>today( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'date', functionName: 'ip_fxDate', tip: 'Returns the current date', inputs: '(increment in days)', example: '<br/>date( 0 )<br/>date( -1 )<br/>date( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'day', functionName: 'ip_fxDay', tip: 'Returns the calendar day in month', inputs: '(increment in days)', example: '<br/>day( 0 )<br/>day( -1 )<br/>day( 1 )' });
@@ -15869,7 +15870,7 @@ function ip_fxHead(GridID, row, col,  fxRanges) {
 
 
     //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'concat', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'head', row, col); }
 
     var value = '';
     var type = '';
@@ -15920,7 +15921,7 @@ function ip_fxTail(GridID, row, col,  fxRanges) {
 
 
     //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'concat', row, col); }
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'tail', row, col); }
 
     var value = '';
     var type = '';
@@ -16098,10 +16099,7 @@ function ip_fxMax(GridID, row, col, fxRanges) {
     GridID = arguments[0];
     row = arguments[1];
     col = arguments[2];
-    increment = arguments[3];
-
-    if (typeof (fxRanges) == 'string') { fxRanges = [ip_fxRangeObject(GridID, row, col, fxRanges)]; }
-    if (fxRanges.length == undefined) { fxRanges = [fxRanges]; }
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
 
     for (var i = 0; i < fxRanges.length; i++) {
 
@@ -16130,6 +16128,53 @@ function ip_fxMax(GridID, row, col, fxRanges) {
         }
         else if (tmp == null || fxRanges[i] > tmp) { tmp = fxRanges[i]; }
         else { throw ip_fxException('1', "Inputs are incorrect, they must be numbers or ranges", 'max', row, col); }
+
+    }
+
+    return value;
+
+}
+
+function ip_fxMin(GridID, row, col, fxRanges) {
+
+
+    //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number, and counts the number of cells in range containing numeric values
+
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'min', row, col); }
+
+    var value = null;
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+    for (var i = 0; i < fxRanges.length; i++) {
+
+        if (typeof (fxRanges[i]) == 'object') {
+
+            var range = fxRanges[i];
+
+            for (var r = range.startRow; r <= range.endRow; r++) {
+
+                if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'range', row, col); }
+
+                for (var c = range.startCol; c <= range.endCol; c++) {
+
+                    if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'min', row, col); }
+
+                    var val = ip_CellDataType(GridID, r, c, true);
+                    if (val.value != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+
+                        if (value == null || val.value < value) { value = val.value; }
+
+                    }
+                }
+
+            }
+
+        }
+        else if (tmp == null || fxRanges[i] > tmp) { tmp = fxRanges[i]; }
+        else { throw ip_fxException('1', "Inputs are incorrect, they must be numbers or ranges", 'min', row, col); }
 
     }
 
