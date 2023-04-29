@@ -8008,7 +8008,8 @@ function ip_DragRange(GridID, options) {
                         increment: (r > options.range.startRow && dataTypePrev.dataType.dataType == 'number' ? (dataType.value - dataTypePrev.value) : (patternCols[c].index + 1 < patternCols[c].values.length ? patternCols[c].values[patternCols[c].index + 1].increment : 0)),
                         value: dataType.value,
                         dataType: dataType.dataType,
-                        dataTypeO: ip_GridProps[GridID].rowData[r].cells[c].dataType
+                        dataTypeO: ip_GridProps[GridID].rowData[r].cells[c].dataType,
+                        formula: ip_GridProps[GridID].rowData[r].cells[c].formula
 
                     }
 
@@ -8020,7 +8021,8 @@ function ip_DragRange(GridID, options) {
                         increment: 0,
                         value: dataType.value,
                         dataType: dataType.dataType,
-                        dataTypeO: ip_GridProps[GridID].rowData[r].cells[c].dataType
+                        dataTypeO: ip_GridProps[GridID].rowData[r].cells[c].dataType,
+                        formula: ip_GridProps[GridID].rowData[r].cells[c].formula
 
                     }
 
@@ -8032,7 +8034,8 @@ function ip_DragRange(GridID, options) {
                         increment: 0,
                         value: dataType.value,
                         dataType: dataType.dataType,
-                        dataTypeO: ip_GridProps[GridID].rowData[r].cells[c].dataType
+                        dataTypeO: ip_GridProps[GridID].rowData[r].cells[c].dataType,
+                        formula: ip_GridProps[GridID].rowData[r].cells[c].formula
 
                     }
 
@@ -8066,7 +8069,24 @@ function ip_DragRange(GridID, options) {
                         var dataType = patternCols[c].values[pr].dataType.dataType;
                         var baseIncrement = patternCols[c].dataTypeIncrement[dataType];
                         var increment = patternCols[c].values[pr].increment;
+                        var formula = patternCols[c].values[pr].formula;
                         var newValue = patternCols[c].values[pr].value;
+                        // regex: cell coordinates, e.g. A0, B5, etc.
+                        var coordPattern = new RegExp(ip_GridProps['index'].regEx.notInBrackets.source + ip_GridProps['index'].regEx.range.source, 'gi');
+
+                        // check if the original cell contained a formula
+                        if(typeof formula !== "undefined") {
+                            // find regex pattern (cell coords) in the formula string
+                            var matched = formula.match(coordPattern);
+                            // check if the formula contained cell coords
+                            if(matched !== null) {
+                                // set the formula field of the cell object
+                                ip_SetCellFormula(GridID, { row: r, col: c, formula: formula, isRowColShuffel: true });
+                                console.log(matched);
+                            } else {
+                                console.log("Does not contain coordinates");
+                            }
+                        }
 
                         if (dataType == 'number') { newValue = (newValue + ((baseIncrement * increment) * p)); }
                                                 
