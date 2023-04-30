@@ -8071,8 +8071,9 @@ function ip_DragRange(GridID, options) {
                         var increment = patternCols[c].values[pr].increment;
                         var formula = patternCols[c].values[pr].formula;
                         var newValue = patternCols[c].values[pr].value;
+
                         // regex: cell coordinates, e.g. A0, B5, etc.
-                        var coordPattern = new RegExp(ip_GridProps['index'].regEx.notInBrackets.source + ip_GridProps['index'].regEx.range.source, 'gi');
+                        var coordPattern= /[A-Za-z]+\d+/gi;
 
                         // check if the original cell contained a formula
                         if(typeof formula !== "undefined") {
@@ -8080,11 +8081,14 @@ function ip_DragRange(GridID, options) {
                             var matched = formula.match(coordPattern);
                             // check if the formula contained cell coords
                             if(matched !== null) {
-                                // set the formula field of the cell object
-                                ip_SetCellFormula(GridID, { row: r, col: c, formula: formula, isRowColShuffel: true });
-                                console.log(matched);
-                            } else {
-                                console.log("Does not contain coordinates");
+                                // store the formula of the above cell
+                                var previousFormula = ip_GridProps[GridID].rowData[r-1].cells[c].formula;
+                                // replace any coordinates in the formula with the incremented ones
+                                var nextFormula = ip_IncrementCellCoords(previousFormula);
+                                // set the formula field of the current cell object
+                                ip_SetCellFormula(GridID, { row: r, col: c, formula: nextFormula, isRowColShuffel: true });
+                                // recalculate the value of the current cell using the new formula
+                                newValue = ip_fxCalculate(GridID, nextFormula.slice(1), r, c);
                             }
                         }
 
@@ -8122,6 +8126,18 @@ function ip_DragRange(GridID, options) {
 
     if (Error != '') { ip_RaiseEvent(GridID, 'warning', TransactionID, Error); }
 
+}
+
+function ip_IncrementCellCoords(fxString) {
+    // a function to replace cell coordinates with the incremented ones (e.g. =A0+B0 to =A1+B1)
+
+    // a pattern that matches a coordinate (e.g. 'A1', 'Az10'), except for a lambda function call (e.g. 'A0(' )
+    var coordPattern = /\b(?![A-Za-z]+[$0-9]+(?=\()\b)([A-Za-z]+\d+)/gi;
+    var numPattern = /\d+/gi; // a pattern that matches a number
+
+    fxString = fxString.replace(coordPattern, function(n){ return n.replace(numPattern, function(x){ return ++x })});
+
+    return fxString;
 }
 
 function ip_ValidateRangeObjects(GridID, ranges, hRow, hCol) {
