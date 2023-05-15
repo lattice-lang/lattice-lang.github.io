@@ -8086,16 +8086,17 @@ function ip_DragRange(GridID, options) {
                                 // replace any coordinates in the formula with the incremented ones
                                 var nextFormula = ip_IncrementCellCoords(previousFormula);
                                 // set the formula field of the current cell object
-                                ip_SetCellFormula(GridID, { row: r, col: c, formula: nextFormula, isRowColShuffel: true });
+                                ip_CellInput(GridID, { row: r, col: c, formula: nextFormula });
                                 // recalculate the value of the current cell using the new formula
                                 newValue = ip_fxCalculate(GridID, nextFormula.slice(1), r, c);
+                                formula = nextFormula;
                             }
                         }
 
                         if (dataType == 'number') { newValue = (newValue + ((baseIncrement * increment) * p)); }
                                                 
                         ip_GridProps[GridID].rowData[r].cells[c].dataType = patternCols[c].values[pr].dataType;
-                        ip_SetValue(GridID, r, c, (newValue == null ? null : newValue));
+                        ip_CellInput(GridID, { row: r, col: c, value: newValue, formula: formula });
 
                         if (Effected.rowData[rIndex] == null) { Effected.rowData[rIndex] = { cells: [], row: r } }
                         Effected.rowData[rIndex].cells[Effected.rowData[rIndex].cells.length] = ip_CloneCell(GridID, r, c);
