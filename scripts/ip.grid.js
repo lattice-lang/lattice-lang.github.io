@@ -16280,103 +16280,108 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
 
 function ip_BuildLambdaFunc(lambdaParams) {
 
-    var argsRange = lambdaParams[0];
-    var bodyRange = lambdaParams[1];
-    var returnCell = lambdaParams[2];
+    var argsRange = lambdaParams[0]; //coordinates of the lambda args cells
+    var bodyRange = lambdaParams[1]; //coordinates of the lambda body cells
+    var returnCell = lambdaParams[2]; //coordinate of the lambda return cell
 
+    //a function that represents the callable lambda based on the user configuration
     var func = function(GridID, row, col, fxRanges){
-
         //fxRanges is an array of ranges e.g. ip_rangeObject or simply a number
         if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'lambda', row, col); }
-
         var tmp = null;
         //array of values created from the arguments passed to the lambda
         var values = [];
+        //a map of args coords and their corresponding values (e.g. {"A0"=>1, "B0"=>3})
+        const args = new Map();
+        //a map of body coords and their corresponding values
+        const body = new Map();
+        //a map of body coords and their formulas
+        const bodyFormulas = new Map();
         //result produced by the lambda function
         var result = null;
-        //pattern to identify formulas
-        //var pattern = "'=";
-
-        GridID = arguments[0];
-        row = arguments[1];
-        col = arguments[2];
+        //array of values or coordinates passed by the user to call the lambda
         fxRanges = Array.prototype.slice.call(arguments).splice(3);
 
-        //loop over the arguments passed to the lambda
+        //loop over the arguments passed to the lambda to save their values
         for (var i = 0; i  < fxRanges.length; i ++) {
-
             //if the argument is a range (or a single coordinate)
             if (typeof(fxRanges[i]) == 'object') {
-
                 var range = fxRanges[i];
-
                 if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
-
                 for (var r = range.startRow; r <= range.endRow; r++) {
-
                     if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'lambda', row, col); }
-
                     for (var c = range.startCol; c <= range.endCol; c++) {
-
                         if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'lambda', row, col); }
-
                         var val = ip_CellDataType(GridID, r, c, true);
-
                         if (val.value != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
                             //add the value of a cell to the values array
                             if (!isNaN(parseFloat(val.value))) { values.push(parseFloat(val.value)); }
                         }
-
                     }
-
                 }
-
             }
             //if the argument is a number
             else if (typeof (tmp = ip_fxCalculate(GridID, fxRanges[i])) == 'number') { values.push(tmp); }
             else if (!isNaN(parseFloat(fxRanges[i]))) { values.push(parseFloat(fxRanges[i])); }
             else { throw ip_fxException('1', "Inputs are incorrect, they must be numbers or ranges", 'lambda', row, col); }
-
         }
 
+        //loop over the argument range declared by the lambda to create a map of args coords and their values
         var j = 0;
-        //loop over the argument range declared by the lambda
         for (var ar = argsRange.startRow; ar <= argsRange.endRow; ar++) {
-
-            if (ip_GridProps[GridID].rowData[ar].loading) { throw ip_fxException('1', 'Row data not loaded', 'lambda', row, col); }
-
             for (var ac = argsRange.startCol; ac <= argsRange.endCol; ac++) {
-                ip_SetValue(GridID, ar, ac, undefined); //reset the args values
-                //copy the values passed to the lambda into the declared argument range
-                ip_SetValue(GridID, ar, ac, values[j]);
+                var coord = ip_ColumnSymboldCharCode(ac)+ar;
+                args.set(coord, values[j]);
                 j++;
             }
         }
 
-
-        //loop over the body range declared by the lambda
+        //loop over the body range declared by the lambda to create a map of body coords and their formulas
         for (var br = bodyRange.startRow; br <= bodyRange.endRow; br++) {
-
             if (ip_GridProps[GridID].rowData[br].loading) { throw ip_fxException('1', 'Row data not loaded', 'lambda', row, col); }
-
             for (var bc = bodyRange.startCol; bc <= bodyRange.endCol; bc++) {
+                //coordinate of the current body cell in A1 notation;
+                var coord = ip_ColumnSymboldCharCode(bc)+br;
                 //get the formula of a body cell
                 var cellFormula = ip_GridProps[GridID].rowData[br].cells[bc].formula;
-                //if cellFormula is not undefined, calculate the formula with given values
-                if (cellFormula != undefined) {
-                    var cellValue = ip_fxCalculate(GridID, cellFormula.replace("=", ""));
-                    ip_SetValue(GridID, br, bc, cellValue);
+                if (cellFormula !== undefined) {
+                    //replace args coords in the formula with their values
+                    cellFormula = ip_ReplaceCellCoordWithValue(args, cellFormula);
                 }
+                //save the formula in a map tied to its coordinate
+                bodyFormulas.set(coord, cellFormula);
             }
         }
 
+        //loop over the body formulas and calculate their values
+        bodyFormulas.forEach(function(value, key) {
+            //if cellFormula is not undefined, calculate the formula with given values
+            if (value !== undefined) {
+                //if the body map contains any previously calculated values,
+                //insert them in the formula in place of the corresponding coord
+                if (body.size !== 0) {value = ip_ReplaceCellCoordWithValue(body, value);}
+                //calculate the value of the current body cell
+                var cellValue = ip_fxCalculate(GridID, value.replace("=", ""));
+                //store the value of the current cell identified by its coordinate in a map
+                body.set(key, cellValue);
+            }
+        });
+
         //get the value of return cell
-        result = ip_CellDataType(GridID, returnCell.startRow, returnCell.startCol, true).value;
+        var returnCellCoord = ip_ColumnSymboldCharCode(returnCell.startCol)+returnCell.startRow;
+        result = body.get(returnCellCoord);
 
         return result;
     };
 
     return func;
+}
+
+function ip_ReplaceCellCoordWithValue(args, formula) {
+    //a pattern to look for in the formula: argument coordinates (e.g. 'A0|B0')
+    let re = new RegExp(Array.from(args.keys()).flat().join('|'),'g');
+    //replace every instance of arg coord in the formula with their values
+    return formula.replace(re, match=>args.get(match));
 }
 
 
