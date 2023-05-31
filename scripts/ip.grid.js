@@ -16245,18 +16245,10 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
     //parameters of the lambda function (0 - args, 1 - body, 2 - return cell)
     //rebuild the formula text written by the user
     for (var i = 0; i < fxRanges.length; i++) {
-
         if (typeof (fxRanges[i]) == 'object') {
-
             var range = fxRanges[i];
             if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
-            var rangeString = '';
-            //if the current range is the return cell, then add only the starting coordinate of the range
-            if (i==fxRanges.length-1) {
-                rangeString = ip_ColumnSymboldCharCode(range.startCol) + range.startRow;
-            } else {
-                rangeString = ip_ColumnSymboldCharCode(range.startCol) + range.startRow + ":" + ip_ColumnSymboldCharCode(range.endCol) + range.endRow;
-            }
+            var rangeString = ip_fxRangeToString(GridID,range);
             formulaString += rangeString + ",";
         }
         else { throw ip_fxException('1', "Inputs are incorrect, they must be ranges", 'lambda', row, col); }
@@ -16345,11 +16337,15 @@ function ip_BuildLambdaFunc(lambdaParams) {
                 //get the formula of a body cell
                 var cellFormula = ip_GridProps[GridID].rowData[br].cells[bc].formula;
                 if (cellFormula !== undefined) {
+                    //replace range in a formula with its comma-separated individual coordinates
+                    cellFormula = ip_ExpandRangeToSingleCoords(GridID, br, bc, cellFormula);
                     //replace args coords in the formula with their values
                     cellFormula = ip_ReplaceCellCoordWithValue(args, cellFormula);
+                    //save the formula in a map tied to its coordinate
+                    bodyFormulas.set(coord, cellFormula);
+                } else {
+                    bodyFormulas.set(coord, ip_GridProps[GridID].rowData[br].cells[bc].value);
                 }
-                //save the formula in a map tied to its coordinate
-                bodyFormulas.set(coord, cellFormula);
             }
         }
 
@@ -16359,7 +16355,10 @@ function ip_BuildLambdaFunc(lambdaParams) {
             if (value !== undefined) {
                 //if the body map contains any previously calculated values,
                 //insert them in the formula in place of the corresponding coord
-                if (body.size !== 0) {value = ip_ReplaceCellCoordWithValue(body, value);}
+                value = value.toString();
+                if (body.size !== 0 && value.startsWith('=')) {
+                    value = ip_ReplaceCellCoordWithValue(body, value);
+                }
                 //calculate the value of the current body cell
                 var cellValue = ip_fxCalculate(GridID, value.replace("=", ""));
                 //store the value of the current cell identified by its coordinate in a map
@@ -16384,7 +16383,23 @@ function ip_ReplaceCellCoordWithValue(args, formula) {
     return formula.replace(re, match=>args.get(match));
 }
 
-
+function ip_ExpandRangeToSingleCoords(GridID, row, col, formula) {
+    //a pattern to look for in the formula: coordinates separated by colon (e.g. 'A0:B0')
+    let re = /[A-Za-z]+\d+:[A-Za-z]+\d+/gi;
+    //replace every instance of range with its expanded version (e.g. 'A0:B1' -> 'A0,B0,A1,B1')
+    var result = formula.replace(re, s=>{
+        //convert string range to range object
+        var rangeObj = ip_fxRangeObject(GridID, row, col, s);
+        var res = ''; //result of expanding range into individual coordinates
+        for (var r = rangeObj.startRow; r <= rangeObj.endRow; r++) {
+            for (var c = rangeObj.startCol; c <= rangeObj.endCol; c++) {
+                res += ip_ColumnSymboldCharCode(c)+r + ',';
+            }
+        }
+        return res.slice(0, -1);
+    });
+    return result;
+}
 
 //----- IP GRID CALCULATIONS ------------------------------------------------------------------------------------------------------------------------------------
 
