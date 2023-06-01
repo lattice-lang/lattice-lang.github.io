@@ -4838,6 +4838,7 @@ var thisBrowser = ip_Browser();
             fxBar: null, //formula bar element to use - may be a custom fbar element
             fxList: {},
             lambdaList: {}, //contains a list of active lambda functions and their respective coordinates
+            lambdaCells: new Map(), //a map of lambda and its associated cells coords (lambda def, args, body)
             selectedCell: null, //td cell object
             selectedColumn: new Array(), //Array of column indexes
             selectedRow: new Array(), //Array of row indexes
@@ -16259,12 +16260,29 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
 
     //the coordinate of the cell that holds the lambda definition in the underscore notation (e.g. A_0)
     var lambdaCoord = ip_ColumnSymboldCharCode(col) + '_' + row;
-
     //function constructed from the lambda definition
     var func = ip_BuildLambdaFunc(fxRanges);
-
     //store the function that is callable using the lambda coordinate in a list of lambdas
     ip_GridProps[GridID].lambdaList[lambdaCoord] = func;
+
+    //lambda definition cell coordinate in A1 notation
+    var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
+    //test if the lambda has been registered
+    if (ip_GridProps[GridID].lambdaCells.has(lambdaCellCoord)) {
+        //reset the background colour of each lambda cell to none
+        ip_LambdaCellsStyle(GridID, ip_GridProps[GridID].lambdaCells.get(lambdaCellCoord), 'none');
+    }
+    //add lambda and its cells coordinates to the map of all defined lambdas
+    ip_GridProps[GridID].lambdaCells.set(lambdaCellCoord, {
+        lambda: ip_fxRangeObject(GridID, row, col, lambdaCellCoord),
+        args: fxRanges[0],
+        body: fxRanges[1],
+        returnVal: fxRanges[2]
+    });
+    //a dictionary of cell coordinates related to lambda
+    var dict = ip_GridProps[GridID].lambdaCells.get(lambdaCellCoord);
+    //set the background colour of lambda cells
+    ip_LambdaCellsStyle(GridID, dict, '#e6f3fe');
 
     return formulaString;
 
@@ -16399,6 +16417,25 @@ function ip_ExpandRangeToSingleCoords(GridID, row, col, formula) {
         return res.slice(0, -1);
     });
     return result;
+}
+
+function ip_LambdaCellsStyle(GridID, dict, color) {
+    var i = 0; //index of the dictionary entry
+    var hue = color; //hue to fill the background of the cell with
+    var offset = 0; //the offset number to calculate the next entry's colour
+    for(let key in dict) {
+        hue = ip_ChangeHue(color, offset); //calculate the hex value of the next colour
+        var value = dict[key]; //the cell coordinate of a lambda constituent
+        for (let r = value.startRow; r <= value.endRow; r++) {
+            for (let c = value.startCol; c <= value.endCol; c++) {
+                var cell = ip_GridProps[GridID].rowData[r].cells[c];
+                //set the background colour of the current cell
+                ip_SetCellFormat(GridID, { row: r, col: c, style: "background-color:"+hue+";" });
+            }
+        }
+        i++;
+        offset+=255/i;
+    }
 }
 
 //----- IP GRID CALCULATIONS ------------------------------------------------------------------------------------------------------------------------------------
