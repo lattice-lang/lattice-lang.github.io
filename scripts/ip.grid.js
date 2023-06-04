@@ -1433,6 +1433,14 @@ var thisBrowser = ip_Browser();
                     
                     var Ignore = false;
 
+                    //reset the background colour of the lambda cells
+                    ip_ResetLambdaCells(GridID, r, c);
+                    var lambdaCellCoord = ip_ColumnSymboldCharCode(c) + '_' + r;
+                    //test if the lambda has been registered
+                    if (ip_GridProps[GridID].lambdaList.has(lambdaCellCoord)) {
+                        //remove lambda from the list of callable lambdas
+                        ip_GridProps[GridID].lambdaList.delete(lambdaCellCoord);
+                    }
 
                     if (options.preserveRange != null) {
                         for (ir = 0; ir < options.preserveRange.length; ir++) {
@@ -4837,7 +4845,7 @@ var thisBrowser = ip_Browser();
             hoverRowIndex: null,
             fxBar: null, //formula bar element to use - may be a custom fbar element
             fxList: {},
-            lambdaList: {}, //contains a list of active lambda functions and their respective coordinates
+            lambdaList: new Map(), //contains a list of active lambda functions and their respective coordinates
             lambdaCells: new Map(), //a map of lambda and its associated cells coords (lambda def, args, body)
             selectedCell: null, //td cell object
             selectedColumn: new Array(), //Array of column indexes
@@ -15649,10 +15657,10 @@ function ip_fxCalculate(GridID, fxString, row, col) {
         }
 
         //check lambdaList for a registered lambda function based on a coordinate
-        for (var key in ip_GridProps[GridID].lambdaList) {
+        for (const key of ip_GridProps[GridID].lambdaList.keys()) {
 
-            fxString = fxString.replace(new RegExp('\\b' + key + '\\(\\)', 'gi'), 'ip_GridProps[GridID].lambdaList["' + key + '"]("'+ GridID + '",' + row + ',' + col + ')');
-            fxString = fxString.replace(new RegExp('\\b' + key + '\\(', 'gi'), 'ip_GridProps[GridID].lambdaList["' + key + '"]("'+ GridID + '",' + row + ',' + col + ',');
+            fxString = fxString.replace(new RegExp('\\b' + key + '\\(\\)', 'gi'), 'ip_GridProps[GridID].lambdaList.get("' + key + '")("'+ GridID + '",' + row + ',' + col + ')');
+            fxString = fxString.replace(new RegExp('\\b' + key + '\\(', 'gi'), 'ip_GridProps[GridID].lambdaList.get("' + key + '")("'+ GridID + '",' + row + ',' + col + ',');
 
         }
 
@@ -16263,15 +16271,12 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
     //function constructed from the lambda definition
     var func = ip_BuildLambdaFunc(fxRanges);
     //store the function that is callable using the lambda coordinate in a list of lambdas
-    ip_GridProps[GridID].lambdaList[lambdaCoord] = func;
+    ip_GridProps[GridID].lambdaList.set(lambdaCoord, func);
 
+    //reset the background colour of the previously defined lambda cells
+    ip_ResetLambdaCells(GridID, row, col);
     //lambda definition cell coordinate in A1 notation
     var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
-    //test if the lambda has been registered
-    if (ip_GridProps[GridID].lambdaCells.has(lambdaCellCoord)) {
-        //reset the background colour of each lambda cell to none
-        ip_LambdaCellsStyle(GridID, ip_GridProps[GridID].lambdaCells.get(lambdaCellCoord), 'none');
-    }
     //add lambda and its cells coordinates to the map of all defined lambdas
     ip_GridProps[GridID].lambdaCells.set(lambdaCellCoord, {
         lambda: ip_fxRangeObject(GridID, row, col, lambdaCellCoord),
@@ -16354,15 +16359,18 @@ function ip_BuildLambdaFunc(lambdaParams) {
                 var coord = ip_ColumnSymboldCharCode(bc)+br;
                 //get the formula of a body cell
                 var cellFormula = ip_GridProps[GridID].rowData[br].cells[bc].formula;
-                if (cellFormula !== undefined) {
+                var cellValue = ip_GridProps[GridID].rowData[br].cells[bc].value;
+                if (cellFormula === null && cellValue === null) { throw ip_fxException('1', 'Return cell cannot be empty', 'lambda', row, col); }
+                else if (cellFormula === "" || cellFormula === null || cellFormula === undefined) {
+                    bodyFormulas.set(coord, cellValue);
+                }
+                else {
                     //replace range in a formula with its comma-separated individual coordinates
                     cellFormula = ip_ExpandRangeToSingleCoords(GridID, br, bc, cellFormula);
                     //replace args coords in the formula with their values
                     cellFormula = ip_ReplaceCellCoordWithValue(args, cellFormula);
                     //save the formula in a map tied to its coordinate
                     bodyFormulas.set(coord, cellFormula);
-                } else {
-                    bodyFormulas.set(coord, ip_GridProps[GridID].rowData[br].cells[bc].value);
                 }
             }
         }
@@ -16435,6 +16443,17 @@ function ip_LambdaCellsStyle(GridID, dict, color) {
         }
         i++;
         offset+=255/i;
+    }
+}
+
+function ip_ResetLambdaCells(GridID, row, col) {
+    //lambda definition cell coordinate in A1 notation
+    var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
+    //test if the lambda has been registered
+    if (ip_GridProps[GridID].lambdaCells.has(lambdaCellCoord)) {
+        //reset the background colour of each lambda cell to none
+        ip_LambdaCellsStyle(GridID, ip_GridProps[GridID].lambdaCells.get(lambdaCellCoord), 'none');
+        ip_GridProps[GridID].lambdaCells.delete(lambdaCellCoord);
     }
 }
 
