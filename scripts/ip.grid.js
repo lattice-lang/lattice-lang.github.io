@@ -16353,15 +16353,18 @@ function ip_BuildLambdaFunc(lambdaParams) {
                 var coord = ip_ColumnSymboldCharCode(bc)+br;
                 //get the formula of a body cell
                 var cellFormula = ip_GridProps[GridID].rowData[br].cells[bc].formula;
-                if (cellFormula !== undefined) {
+                var cellValue = ip_GridProps[GridID].rowData[br].cells[bc].value;
+                if (cellFormula === null && cellValue === null) { throw ip_fxException('1', 'Return cell cannot be empty', 'lambda', row, col); }
+                else if (cellFormula === "" || cellFormula === null || cellFormula === undefined) {
+                    bodyFormulas.set(coord, cellValue);
+                }
+                else {
                     //replace range in a formula with its comma-separated individual coordinates
                     cellFormula = ip_ExpandRangeToSingleCoords(GridID, br, bc, cellFormula);
                     //replace args coords in the formula with their values
                     cellFormula = ip_ReplaceCellCoordWithValue(args, cellFormula);
                     //save the formula in a map tied to its coordinate
                     bodyFormulas.set(coord, cellFormula);
-                } else {
-                    bodyFormulas.set(coord, ip_GridProps[GridID].rowData[br].cells[bc].value);
                 }
             }
         }
