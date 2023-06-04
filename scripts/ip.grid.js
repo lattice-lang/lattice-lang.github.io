@@ -1433,6 +1433,8 @@ var thisBrowser = ip_Browser();
                     
                     var Ignore = false;
 
+                    //reset the background colour of the lambda cells
+                    ip_ResetLambdaCells(GridID, r, c);
 
                     if (options.preserveRange != null) {
                         for (ir = 0; ir < options.preserveRange.length; ir++) {
@@ -16265,13 +16267,10 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
     //store the function that is callable using the lambda coordinate in a list of lambdas
     ip_GridProps[GridID].lambdaList[lambdaCoord] = func;
 
+    //reset the background colour of the previously defined lambda cells
+    ip_ResetLambdaCells(GridID, row, col);
     //lambda definition cell coordinate in A1 notation
     var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
-    //test if the lambda has been registered
-    if (ip_GridProps[GridID].lambdaCells.has(lambdaCellCoord)) {
-        //reset the background colour of each lambda cell to none
-        ip_LambdaCellsStyle(GridID, ip_GridProps[GridID].lambdaCells.get(lambdaCellCoord), 'none');
-    }
     //add lambda and its cells coordinates to the map of all defined lambdas
     ip_GridProps[GridID].lambdaCells.set(lambdaCellCoord, {
         lambda: ip_fxRangeObject(GridID, row, col, lambdaCellCoord),
@@ -16435,6 +16434,17 @@ function ip_LambdaCellsStyle(GridID, dict, color) {
         }
         i++;
         offset+=255/i;
+    }
+}
+
+function ip_ResetLambdaCells(GridID, row, col) {
+    //lambda definition cell coordinate in A1 notation
+    var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
+    //test if the lambda has been registered
+    if (ip_GridProps[GridID].lambdaCells.has(lambdaCellCoord)) {
+        //reset the background colour of each lambda cell to none
+        ip_LambdaCellsStyle(GridID, ip_GridProps[GridID].lambdaCells.get(lambdaCellCoord), 'none');
+        ip_GridProps[GridID].lambdaCells.delete(lambdaCellCoord);
     }
 }
 
