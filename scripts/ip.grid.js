@@ -8085,7 +8085,7 @@ function ip_DragRange(GridID, options) {
                         var coordPattern= /[A-Za-z]+\d+/gi;
 
                         // check if the original cell contained a formula
-                        if(typeof formula !== "undefined") {
+                        if(!(formula === "" || formula === null || formula === undefined)) {
                             // find regex pattern (cell coords) in the formula string
                             var matched = formula.match(coordPattern);
                             // check if the formula contained cell coords
