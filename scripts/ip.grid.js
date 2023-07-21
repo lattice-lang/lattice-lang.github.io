@@ -6650,7 +6650,7 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'date', functionName: 'ip_fxDate', tip: 'Returns the current date', inputs: '(increment in days)', example: '<br/>date( 0 )<br/>date( -1 )<br/>date( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'day', functionName: 'ip_fxDay', tip: 'Returns the calendar day in month', inputs: '(increment in days)', example: '<br/>day( 0 )<br/>day( -1 )<br/>day( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'if', functionName: 'ip_fxIf', tip: 'Returns one value if a logical expression is \'TRUE\' and another if it is \'FALSE\'.', inputs: '(logical_expression, value_if_true, value_if_false)', example: 'if(A2,\'A2 was true\',\'A2 was false\')' });
-    $('#' + GridID).ip_AddFormula({ formulaName: 'lambda', functionName: 'ip_fxLambda', tip: 'Defines a lambda function, based on the given arguments.', inputs: '( arg_range, body_range, return_cell)', example: 'lambda( a1, b1:b5, a3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'lambda', functionName: 'ip_fxLambda', tip: 'Defines a lambda function, based on the given arguments.', inputs: '( arg_range, body_range, return_cell)', example: 'lambda( a1:a2, b1:b5, b3 )' });
 
 }
 
@@ -15234,7 +15234,7 @@ function ip_EditToolHelp(GridID, text, carret, carretIncr, showToolTip, setCurso
     }
 
 
-    if (showToolTip && fx) { ip_ShowEditToolHelpToolTip(GridID, ip_fxInfo(GridID, fx.focused.value)); };// else { $(helpTool).hide(); }
+    if (showToolTip && fx) { ip_ShowEditToolHelpToolTip(GridID, ip_fxInfo(GridID, fx.focused.value.toLowerCase())); }// else { $(helpTool).hide(); }
     if (setEditTool) { ip_GridProps[GridID].editing.editTool.text(text, null, cStart, cEnd); }
 
     return fx;      
@@ -15283,7 +15283,7 @@ function ip_ShowEditToolHelpToolTip(GridID, fxInfo) {
             fade:100,
             buttons: {
                 //anchor: { text: 'ANCHOR', style: "background-color:#4545a1;", onClick: function () { $().ip_Modal({ show: false }) } },
-                hide: { text: 'HIDE', style: "background-color:#9c3b3b;", onClick: function () { $().ip_Modal({ show: false }) } },                
+                hide: { text: 'HIDE', style: "background-color:#9c3b3b;", onClick: function () { $().ip_Modal({ show: false, fade:100 }) } },
                 ok: { },
                 cancel: { }
             }
