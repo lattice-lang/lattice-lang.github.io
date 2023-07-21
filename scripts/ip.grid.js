@@ -6639,6 +6639,9 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'count', functionName: 'ip_fxCount', tip: 'Counts the number of cells which have numeric values. Ignores cells that are empty or text.', inputs: '(range1, range2, ... )', example: 'count( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'sum', functionName: 'ip_fxSum', tip: 'Adds the numbers in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'sum( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'concat', functionName: 'ip_fxConcat', tip: 'Joins the values of cells into one text string.', inputs: '( range1, range2, ... )', example: 'concat( a1, b1:b5, a3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'length', functionName: 'ip_fxLength', tip: 'Returns the length of a string.', inputs: '( string )', example: 'length( "hello" ) -> 5' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'head', functionName: 'ip_fxHead', tip: 'Returns the head of the string (leftmost character of a string).', inputs: '( string )', example: 'head("mystring") -> "m"' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'tail', functionName: 'ip_fxTail', tip: 'Returns the tail of the string (right substring after first character).', inputs: '( string )', example: 'tail("mystring") -> "ystring"' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'dropdown', functionName: 'ip_fxDropDown', tip: 'Fetches a range and returns the values as a dropdown object', inputs: '( range1, range2, ... )', example: 'dropdown( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'gantt', functionName: 'ip_fxGantt', tip: 'Returns true or false if the base date falls within start and end date ranges', inputs: '( BaseDate, StartDate, EndDate, TaskName, ProjectName (optional) )', example: '<br/>gantt( 2014-07-15, 2014-07-01, 2014-07-31, Cost of sales report, General Management )<br/>gantt( today(0), a1, a2, Cost of sales report, General Management )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'max', functionName: 'ip_fxMax', tip: 'Returns the largest number in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'max( a1, b1:b5, a3 )' });
@@ -15904,6 +15907,109 @@ function ip_fxConcat(GridID, row, col,  fxRanges) {
 
     }
 
+    if (value.length > 500) { value = value.substr(0, 500); }
+
+    return value;
+
+}
+
+function ip_fxLength(GridID, row, col,  fxRanges) {
+    //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'length', row, col); }
+
+    var value = 0;
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+    //if the user input is a coordinate
+    if (typeof (fxRanges[0]) == 'object') {
+        var range = fxRanges[0];
+        var r = range.startRow;
+        var c = range.startCol;
+        if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+        //throw an exception if the row data is not loaded
+        if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'range', row, col); }
+        //throw an exception if a circular dependency is detected
+        if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'length', row, col); }
+        var val = ip_CellDataType(GridID, r, c, true);
+        if (val.display != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+            value = String(val.display).length;
+        }
+    }
+    //else, convert the user input to string and calculate its length
+    else if (fxRanges[0] != null) { value = String(fxRanges[0]).length; }
+
+    return value;
+
+}
+
+function ip_fxHead(GridID, row, col,  fxRanges) {
+//fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'length', row, col); }
+
+    var value = 0;
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+    //if the user input is a coordinate
+    if (typeof (fxRanges[0]) == 'object') {
+        var range = fxRanges[0];
+        var r = range.startRow;
+        var c = range.startCol;
+        if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+        //throw an exception if the row data is not loaded
+        if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'range', row, col); }
+        //throw an exception if a circular dependency is detected
+        if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'length', row, col); }
+        var val = ip_CellDataType(GridID, r, c, true);
+        if (val.display != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+            value = String(val.display).slice(0,1);
+        }
+    }
+    //else, convert the user input to string and calculate its length
+    else if (fxRanges[0] != null) { value = String(fxRanges[0]).slice(0,1); }
+
+    //if the value is more than 500 characters long, trim it to the first 500 char
+    if (value.length > 500) { value = value.substr(0, 500); }
+
+    return value;
+
+}
+
+
+function ip_fxTail(GridID, row, col,  fxRanges) {
+//fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'length', row, col); }
+
+    var value = 0;
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+    //if the user input is a coordinate
+    if (typeof (fxRanges[0]) == 'object') {
+        var range = fxRanges[0];
+        var r = range.startRow;
+        var c = range.startCol;
+        if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+        //throw an exception if the row data is not loaded
+        if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'range', row, col); }
+        //throw an exception if a circular dependency is detected
+        if (r == row && c == col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'length', row, col); }
+        var val = ip_CellDataType(GridID, r, c, true);
+        if (val.display != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+            value = String(val.display).slice(1);
+        }
+    }
+    //else, convert the user input to string and calculate its length
+    else if (fxRanges[0] != null) { value = String(fxRanges[0]).slice(1); }
+
+    //if the value is more than 500 characters long, trim it to the first 500 char
     if (value.length > 500) { value = value.substr(0, 500); }
 
     return value;
