@@ -15641,53 +15641,79 @@ function ip_fxCalculate(GridID, fxString, row, col) {
 
     try {
 
-        //
-        var rxRootRanges = new RegExp(ip_GridProps['index'].regEx.notInBrackets.source + ip_GridProps['index'].regEx.range.source, 'gi');  // /(?=[^"]*(?:"[^"]*"[^"]*)*$)(?![^(]*[,)])[a-z]\d+(:\w+)?/gi; ///(?![^("]*[)"])(([a-z]+[0-9]+[:][a-z]+[0-9]+)|([a-z]+[0-9]+))/gi;
-        
+        var pattern;
+        var substitute;
+
         ip_fxValidate(GridID, fxString, row, col);
 
-        fxString = ip_ReplaceCellCall(fxString); //replace cell call with an underscore notation ( e.g. 'A0(' -> 'A_0(' )
+        //*** convert function name to lower case and remove whitespace
+        pattern = /^[^\(]+/gi;
+        substitute = (match) => match.trim().toLowerCase();
+        fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+        //***
 
-        fxString = fxString.replace(rxRootRanges, function (arg) { return 'ip_fxRange("' + GridID + '",' + row + ',' + col + ',"' + arg + '")'; }); //regular expression to replace ranges with quotes
+        //*** replace cell call with an underscore notation ( e.g. 'A0(' -> 'A_0(' )
+        pattern = /([$0-9]+)(?=\()/gi;
+        substitute = "_$&";
+        fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+        //***
 
-        //if fxString starts with 'if(...)', then coordinates are replaced with function calls to get their respective values
-        //e.g. A0 -> ip_CellDataType(GridID,ip_fxRangeObject(GridID,row,col,"a0").startRow,ip_fxRangeObject(GridID,row,col,"a0").startCol,true).value
-        if ( fxString.startsWith("if(") ) {
-            fxString = fxString.replace(ip_GridProps['index'].regEx.range, function (arg) { return 'ip_CellDataType("' + GridID + '",ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '").startRow,ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '").startCol,true).value'; });
+        //*** regular expression to replace ranges with quotes
+        //*** regex /(?=[^"]*(?:"[^"]*"[^"]*)*$)(?![^(]*[,)])[a-z]\d+(:\w+)?/gi; ///(?![^("]*[)"])(([a-z]+[0-9]+[:][a-z]+[0-9]+)|([a-z]+[0-9]+))/gi;
+        pattern = new RegExp(ip_GridProps['index'].regEx.notInBrackets.source + ip_GridProps['index'].regEx.range.source, 'gi');
+        substitute = (arg) => 'ip_fxRange("' + GridID + '",' + row + ',' + col + ',"' + arg + '")';
+        fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+        //***
+
+        //*** if fxString starts with 'if(...)', then coordinates are replaced with function calls to get their respective values
+        //*** e.g. A0 -> ip_CellDataType(GridID,ip_fxRangeObject(GridID,row,col,"a0").startRow,ip_fxRangeObject(GridID,row,col,"a0").startCol,true).value
+        pattern = new RegExp(ip_GridProps['index'].regEx.range, 'gi');
+        if (fxString.startsWith("if(")) {
+            substitute = (arg) => 'ip_CellDataType("' + GridID + '",ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '").startRow,ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '").startCol,true).value';
+            fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+        } else {
+            substitute = (arg) => 'ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '")';
+            fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
         }
-        else {
-            fxString = fxString.replace(ip_GridProps['index'].regEx.range, function (arg) { return 'ip_fxRangeObject("' + GridID + '",' + row + ',' + col + ',"' + arg + '")'; });
-        }
+        //***
 
-        //check lambdaList for a registered lambda function based on a coordinate
+        //*** check lambdaList for a registered lambda function based on a coordinate
         for (const key of ip_GridProps[GridID].lambdaList.keys()) {
+            pattern = new RegExp('\\b' + key + '\\(\\)', 'gi');
+            substitute = 'ip_GridProps[GridID].lambdaList.get("' + key + '")("' + GridID + '",' + row + ',' + col + ')';
+            fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+            pattern = new RegExp('\\b' + key + '\\(', 'gi');
+            substitute = 'ip_GridProps[GridID].lambdaList.get("' + key + '")("' + GridID + '",' + row + ',' + col + ',';
+            fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+        }
+        //***
 
-            fxString = fxString.replace(new RegExp('\\b' + key + '\\(\\)', 'gi'), 'ip_GridProps[GridID].lambdaList.get("' + key + '")("'+ GridID + '",' + row + ',' + col + ')');
-            fxString = fxString.replace(new RegExp('\\b' + key + '\\(', 'gi'), 'ip_GridProps[GridID].lambdaList.get("' + key + '")("'+ GridID + '",' + row + ',' + col + ',');
-
+        //*** check fxList for a registered function based on the user input
+        for (const key in ip_GridProps[GridID].fxList) {
+            pattern = new RegExp('\\b' + key + '\\(\\)', 'gi');
+            substitute = ip_GridProps[GridID].fxList[key].fxName + '("' + GridID + '",' + row + ',' + col + ')';
+            fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+            pattern = new RegExp('\\b' + key + '\\(', 'gi');
+            substitute = ip_GridProps[GridID].fxList[key].fxName + '("' + GridID + '",' + row + ',' + col + ',';
+            fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
         }
 
-        for (var key in ip_GridProps[GridID].fxList) {
-                        
-            fxString = fxString.replace(new RegExp('\\b' + key + '\\(\\)', 'gi'), ip_GridProps[GridID].fxList[key].fxName + '("' + GridID + '",' + row + ',' + col + ')');
-            fxString = fxString.replace(new RegExp('\\b' + key + '\\(', 'gi'), ip_GridProps[GridID].fxList[key].fxName + '("' + GridID + '",' + row + ',' + col + ',');
-
-        }
-                
         return eval(fxString);
-    }
-    catch (ex) {
-        if (ex.fxName) { return ex; }
-        else { return ip_fxException(1, ex.message, 'eval', row, col); }
+
+    } catch (ex) {
+
+        if (ex.fxName) {
+            return ex;
+        } else {
+            return ip_fxException(1, ex.message, 'eval', row, col);
+        }
+
     }
 
 }
 
-function ip_ReplaceCellCall(fxString) {
-    // function to replace cell notation (e.g.A0) with col_row string (e.g.A_0)
-    var pattern = /([$0-9]+)(?=\()/gi;
-    fxString = fxString.replace(pattern, "_$&"); //regular expression to replace ranges with quotes
-
+function ip_ReplacePatternWithSub(fxString, pattern, sub) {
+    fxString = fxString.replace(pattern, sub);
     return fxString;
 }
 
