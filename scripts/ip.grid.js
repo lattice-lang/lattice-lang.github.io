@@ -6655,7 +6655,7 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'date', functionName: 'ip_fxDate', tip: 'Returns the current date', inputs: '(increment in days)', example: '<br/>date( 0 )<br/>date( -1 )<br/>date( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'day', functionName: 'ip_fxDay', tip: 'Returns the calendar day in month', inputs: '(increment in days)', example: '<br/>day( 0 )<br/>day( -1 )<br/>day( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'if', functionName: 'ip_fxIf', tip: 'Returns one value if a logical expression is \'TRUE\' and another if it is \'FALSE\'.', inputs: '(logical_expression, value_if_true, value_if_false)', example: 'if(A2,\'A2 was true\',\'A2 was false\')' });
-    $('#' + GridID).ip_AddFormula({ formulaName: 'lambda', functionName: 'ip_fxLambda', tip: 'Defines a lambda function, based on the given arguments.', inputs: '( arg_range, body_range, return_cell)', example: 'lambda( a1:a2, b1:b5, b3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'lambda', functionName: 'ip_fxLambda', tip: 'Defines a lambda, based on the given parameters. function_name is optional.', inputs: '( arg_range, body_range, return_cell, function_name)', example: 'lambda( a1:a2, b1:b5, b3, "hello" )' });
 
 }
 
@@ -16400,6 +16400,7 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
     var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
     if (fxRanges.length === 4) {
         formulaString = fxRanges[3];
+        if (typeof (formulaString) !== 'string') throw ip_fxException('1',"Illegal lambda name: please input a string in quotes",'lambda',row,col);
         if (ip_ValidateLambdaName(GridID, row, col, formulaString)) ip_GridProps[GridID].lambdaNamespace.set(lambdaCellCoord, formulaString);
     } else {
         //user defined formula for a lambda function
