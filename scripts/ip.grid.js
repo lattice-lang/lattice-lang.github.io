@@ -13280,7 +13280,7 @@ function ip_CellInput(GridID, options) {
 
     EffectedRecalculated = ip_ReCalculateFormulas(GridID, { recalcSource: false, render: false, raiseEvent: false, transactionID: TransactionID, range: options.range }).Effected;
     Effected.rowData = Effected.rowData.concat(EffectedRecalculated.rowData);
-
+    $('#'+GridID).ip_ReCalculate(); //recalculate sheet to account for user-defined custom functions (named lambdas)
     if (options.raiseEvent || options.render) {
         if (Effected.rowData.length == 1 && Effected.rowData[0].cells.length == 1 && (EffectedRecalculated == null || EffectedRecalculated.rowData.length == 0)) {
 
@@ -16400,7 +16400,7 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
     var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
     if (fxRanges.length === 4) {
         formulaString = fxRanges[3];
-        ip_GridProps[GridID].lambdaNamespace.set(lambdaCellCoord, formulaString);
+        if (ip_ValidateLambdaName(GridID, row, col, formulaString)) ip_GridProps[GridID].lambdaNamespace.set(lambdaCellCoord, formulaString);
     } else {
         //user defined formula for a lambda function
         formulaString = "=lambda(";
@@ -16444,6 +16444,19 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
 
     return formulaString;
 
+}
+
+function ip_ValidateLambdaName(GridID, row, col, lambdaName) {//validate user-defined lambda function name
+    if (!lambdaName) throw ip_fxException('1',"Illegal lambda name: cannot be empty",'lambda',row,col);
+    else if (/^_/.test(lambdaName)) throw ip_fxException('1',"Illegal lambda name: cannot start with underscore",'lambda',row,col);
+    else if (/^\s/.test(lambdaName)) throw ip_fxException('1',"Illegal lambda name: cannot start with space",'lambda',row,col);
+    else if (/\d/.test(lambdaName)) throw ip_fxException('1',"Illegal lambda name: cannot contain numbers",'lambda',row,col);
+    else if (lambdaName.toLowerCase() in ip_GridProps[GridID].fxList) throw ip_fxException('1',"Illegal lambda name: reserved word",'lambda',row,col);
+    else if (ip_GridProps[GridID].lambdaNamespace.size !== 0 && Array.from(ip_GridProps[GridID].lambdaNamespace.values()).includes(lambdaName.toLowerCase())) {
+        if (!ip_GridProps[GridID].lambdaNamespace.has(ip_ColumnSymboldCharCode(col)+row))
+            throw ip_fxException('1',"Illegal lambda name: function already exists",'lambda',row,col);
+    }
+    else return true;
 }
 
 function ip_BuildLambdaFunc(lambdaParams) {
