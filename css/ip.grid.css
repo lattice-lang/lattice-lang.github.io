@@ -219,7 +219,7 @@
     /*#f1f1f1;*/
 
     font-family:Verdana;
-    font-size:11px;
+    font-size:12px;
     border-collapse:collapse;
     /*border:solid 1px red;*/
     border-bottom:solid 1px #e5e5e5;
@@ -303,8 +303,9 @@
 
 }
 .ip_grid_cell_error {
+    font-weight:bold;
     background-color:#ffeeee;
-    color:red;
+    color:Crimson;
 
 }
 
@@ -1325,18 +1326,21 @@ box-shadow: 0px 0px 3px 0px black;
     text-align:center;
     /*border-top:solid 1px #47660e;*/
     font-family:Verdana;
-    font-size:11px;
+    font-size:15px;
     font-weight:bold;
     color:black;
     box-shadow:0px 0px 3px 0px black;
     opacity:0.8;
     padding:10px 10px 10px 10px;
     background-color:#668b21;
-    width:100%;
+    width:50%;
     position:fixed;
     z-index:10;
     display:none;
     bottom:0px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
 }
 .ip_FooterDialog_Text{
 	padding:10px;
