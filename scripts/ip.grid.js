@@ -13767,7 +13767,7 @@ function ip_ValidateCellValue(GridID, fxResult, row, col, showWarning) {
     }
 
     if (fxResult.error && fxResult.error.errorDescription && showWarning) {
-        ip_ShowFooterAlert("You have entered an invalid cell value", fxResult.error.errorDescription + ".", null, (fxResult.validation.validationAction == 'allow' ? 'green' : 'red'));
+        ip_ShowFooterAlert("You have entered an invalid cell value", fxResult.error.errorDescription + ".", null, (fxResult.validation.validationAction == 'allow' ? '#90ee90' : '#ff4d4d'));
         if (fxResult.validation.validationAction == 'prevent') { fxResult.reject = true; }
     }
 
@@ -18162,9 +18162,9 @@ function ip_RaiseEvent(GridID, eType, transactionID, args) {
     
     switch (eType)
     {
-        case 'warning': ip_ShowFooterAlert('hmmm', args, '', 'red', 3000); break;
+        case 'warning': ip_ShowFooterAlert('hmmm', args, '', '#d9bfd9', 3000); break;
         case 'message': ip_ShowFooterAlert('hmmm', args, '', 'lightblue', 3000); break;
-        case 'error': ip_ShowFooterAlert('hmmm', args, '', 'red', 3000); break;
+        case 'error': ip_ShowFooterAlert('hmmm', args, '', '#ff4d4d', 3000); break;
         case 'ip_CellInput': $('#' + GridID).trigger(eType, ip_eventObject(GridID, eType, transactionID, args)); break;
         case 'ip_SetCellValues': $('#' + GridID).trigger(eType, ip_eventObject(GridID, eType, transactionID, args)); break;
         case 'ip_ResizeColumn': $('#' + GridID).trigger(eType, ip_eventObject(GridID, eType, transactionID, args)); break;
