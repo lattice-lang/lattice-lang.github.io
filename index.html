@@ -5,6 +5,7 @@
   <script src="scripts/jquery-ui-1.9.2.custom.min.js"></script>
   <script src="scripts/ip.grid.js"></script>
   <link href="css/ip.grid.css" rel="stylesheet" />
+  <link href="favicon.ico?v=M44lzPylqQ" rel="icon" />
 
   <script>
 
@@ -40,6 +41,13 @@
       width:100%;
       height:100%;
     }
+
+    .sub_div {
+
+      font-size: 13px;
+      position: absolute;
+      bottom: 0;
+    }
   </style>
 
   <title>lattice-lang</title>
@@ -48,9 +56,13 @@
 <body>
 
 <h1>Lattice</h1>
-<p>Available standard functions: range, count, sum, concat, length, head, tail, dropdown, gantt, max, min, today, date, day, if, lambda.</p>
+<p>Available standard functions: <b style="color:#a8dcf0">concat, count, date, day, dropdown, gantt, head, if, lambda, length, max, min, range, sum, tail, today</b>.</p>
 <div class="gridContainer">
   <div id="demo"></div>
+</div>
+<div class="sub_div">
+  <p>&copy; This enhanced spreadsheet is based on <a href="https://github.com/marzsocks/ipgrid" target="_blank" rel="noopener noreferrer">ipgrid</a> by Michael Roberg <br>
+    &copy; The favicon is <a href="https://www.flaticon.com/free-icon/hashtag_9595849" target="_blank" rel="noopener noreferrer">by vectaicon</a> - Flaticon</p>
 </div>
 </body>
 </html>
