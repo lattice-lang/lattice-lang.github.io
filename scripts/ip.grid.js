@@ -13280,7 +13280,7 @@ function ip_CellInput(GridID, options) {
 
     EffectedRecalculated = ip_ReCalculateFormulas(GridID, { recalcSource: false, render: false, raiseEvent: false, transactionID: TransactionID, range: options.range }).Effected;
     Effected.rowData = Effected.rowData.concat(EffectedRecalculated.rowData);
-    $('#'+GridID).ip_ReCalculate(); //recalculate sheet to account for user-defined custom functions (named lambdas)
+    if ((/=\s*lambda\s*\(/gi).test(options.valueRAW)) $('#'+GridID).ip_ReCalculate(); //recalculate sheet to account for user-defined custom functions (named lambdas)
     if (options.raiseEvent || options.render) {
         if (Effected.rowData.length == 1 && Effected.rowData[0].cells.length == 1 && (EffectedRecalculated == null || EffectedRecalculated.rowData.length == 0)) {
 
