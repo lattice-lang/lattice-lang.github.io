@@ -1435,11 +1435,14 @@ var thisBrowser = ip_Browser();
 
                     //reset the background colour of the lambda cells
                     ip_ResetLambdaCells(GridID, r, c);
-                    var lambdaCellCoord = ip_ColumnSymboldCharCode(c) + '_' + r;
+                    var lambdaCellCoordUnderscore = ip_ColumnSymboldCharCode(c) + '_' + r;
+                    var lambdaCellCoord = lambdaCellCoordUnderscore.replace("_", "");
                     //test if the lambda has been registered
-                    if (ip_GridProps[GridID].lambdaList.has(lambdaCellCoord)) {
+                    if (ip_GridProps[GridID].lambdaList.has(lambdaCellCoordUnderscore)) {
                         //remove lambda from the list of callable lambdas
-                        ip_GridProps[GridID].lambdaList.delete(lambdaCellCoord);
+                        ip_GridProps[GridID].lambdaList.delete(lambdaCellCoordUnderscore);
+                        //remove lambda from the lambda namespace
+                        if (ip_GridProps[GridID].lambdaNamespace.has(lambdaCellCoord)) ip_GridProps[GridID].lambdaNamespace.delete(lambdaCellCoord);
                     }
 
                     if (options.preserveRange != null) {
@@ -1484,6 +1487,7 @@ var thisBrowser = ip_Browser();
             }
 
         }
+        $('#'+GridID).ip_ReCalculate(); // recalculate grid to update dependent cells
 
         Effected.rowData = ip_ReCalculateFormulas(GridID, { range: arrRange, transactionID: TransactionID, render: true, raiseEvent: false }).Effected.rowData;
 
@@ -4846,6 +4850,7 @@ var thisBrowser = ip_Browser();
             fxBar: null, //formula bar element to use - may be a custom fbar element
             fxList: {},
             lambdaList: new Map(), //contains a list of active lambda functions and their respective coordinates
+            lambdaNamespace: new Map(), //maps user-defined lambda name to its coordinate
             lambdaCells: new Map(), //a map of lambda and its associated cells coords (lambda def, args, body)
             selectedCell: null, //td cell object
             selectedColumn: new Array(), //Array of column indexes
@@ -6650,7 +6655,7 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'date', functionName: 'ip_fxDate', tip: 'Returns the current date', inputs: '(increment in days)', example: '<br/>date( 0 )<br/>date( -1 )<br/>date( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'day', functionName: 'ip_fxDay', tip: 'Returns the calendar day in month', inputs: '(increment in days)', example: '<br/>day( 0 )<br/>day( -1 )<br/>day( 1 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'if', functionName: 'ip_fxIf', tip: 'Returns one value if a logical expression is \'TRUE\' and another if it is \'FALSE\'.', inputs: '(logical_expression, value_if_true, value_if_false)', example: 'if(A2,\'A2 was true\',\'A2 was false\')' });
-    $('#' + GridID).ip_AddFormula({ formulaName: 'lambda', functionName: 'ip_fxLambda', tip: 'Defines a lambda function, based on the given arguments.', inputs: '( arg_range, body_range, return_cell)', example: 'lambda( a1:a2, b1:b5, b3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'lambda', functionName: 'ip_fxLambda', tip: 'Defines a lambda, based on the given parameters. function_name is optional.', inputs: '( arg_range, body_range, return_cell, function_name)', example: 'lambda( a1:a2, b1:b5, b3, "hello" )' });
 
 }
 
@@ -13275,7 +13280,7 @@ function ip_CellInput(GridID, options) {
 
     EffectedRecalculated = ip_ReCalculateFormulas(GridID, { recalcSource: false, render: false, raiseEvent: false, transactionID: TransactionID, range: options.range }).Effected;
     Effected.rowData = Effected.rowData.concat(EffectedRecalculated.rowData);
-
+    $('#'+GridID).ip_ReCalculate(); //recalculate sheet to account for user-defined custom functions (named lambdas)
     if (options.raiseEvent || options.render) {
         if (Effected.rowData.length == 1 && Effected.rowData[0].cells.length == 1 && (EffectedRecalculated == null || EffectedRecalculated.rowData.length == 0)) {
 
@@ -14904,7 +14909,6 @@ function ip_TextEditbleBlur(GridID, defaultValue, editTool, editToolInput, eleme
         ip_RaiseEvent(GridID, 'warning', null, Error);
 
     }
-
     return false;
 }
 
@@ -15405,7 +15409,7 @@ function ip_fxValue(GridID, formula, row, col) {
     else {
 
         var result = ip_fxCalculate(GridID, formula.substring(1, formula.length), row, col);
-             
+
         if (result != null && !result.errorCode) {
 
             if (typeof (result) == 'object') {
@@ -15646,14 +15650,25 @@ function ip_fxCalculate(GridID, fxString, row, col) {
 
         ip_fxValidate(GridID, fxString, row, col);
 
-        //*** convert function name to lower case and remove whitespace
-        pattern = /^[^\(]+/gi;
-        substitute = (match) => match.trim().toLowerCase();
-        fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+        //*** convert function name to lower case and remove whitespace after the function name (e.g. 'sum (' -> 'sum(' )
+        pattern = /(.+)(?=\()/gi; //one or more occurrences of any char (except newline) followed by '('
+        substitute = (match) => match.toLowerCase();
+        fxString = ip_ReplacePatternWithSub(fxString.trim(), pattern, substitute);
+        pattern = /\s+(?=\()/gi; //one or more whitespace followed by '('
+        substitute = '';
+        fxString = ip_ReplacePatternWithSub(fxString, pattern,substitute);
+        //***
+
+        //*** replace user-defined lambda name with its coordinate
+        for (let [key, value] of ip_GridProps[GridID].lambdaNamespace) {
+            pattern = new RegExp('\\b' + value + '\\(', 'gi');
+            substitute = key + '(';
+            fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
+        }
         //***
 
         //*** replace cell call with an underscore notation ( e.g. 'A0(' -> 'A_0(' )
-        pattern = /([$0-9]+)(?=\()/gi;
+        pattern = /([$0-9]+)(?=\()/gi; //one or more digits followed by '('
         substitute = "_$&";
         fxString = ip_ReplacePatternWithSub(fxString, pattern, substitute);
         //***
@@ -16369,34 +16384,43 @@ function ip_fxIf(GridID, row, col, fxRanges) {
 
 function ip_fxLambda(GridID, row, col,  fxRanges) {
 
-    //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
-    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'lambda', row, col); }
+    //if no arguments are supplied to =lambda(...), throw an error
+    if (arguments.length < 4) { throw ip_fxException('1',"Missing input parameters",'lambda',row,col); }
 
     GridID = arguments[0];
     row = arguments[1];
     col = arguments[2];
     fxRanges = Array.prototype.slice.call(arguments).splice(3);
 
-    //lambda function definition must specify the arguments, body, and a return cell
-    if (fxRanges.length != 3) { throw ip_fxException('1', "provide exactly 3 parameters: args-range, body-range, return-cell", 'lambda', row, col); }
+    //lambda function definition must specify the arguments, body, and a return cell and optionally a name
+    if (fxRanges.length !== 3 && fxRanges.length !== 4) { throw ip_fxException('1',"provide at least 3 (max 4) parameters: args-range, body-range, return-cell, name-string (optional)",'lambda',row,col); }
 
-    //user defined formula for a lambda function
-    var formulaString = "=lambda(";
-
-    //parameters of the lambda function (0 - args, 1 - body, 2 - return cell)
-    //rebuild the formula text written by the user
-    for (var i = 0; i < fxRanges.length; i++) {
-        if (typeof (fxRanges[i]) == 'object') {
-            var range = fxRanges[i];
-            if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
-            var rangeString = ip_fxRangeToString(GridID,range);
-            formulaString += rangeString + ",";
+    var formulaString = '';
+    //lambda definition cell coordinate in A1 notation
+    var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
+    if (fxRanges.length === 4) {
+        formulaString = fxRanges[3];
+        if (typeof (formulaString) !== 'string') throw ip_fxException('1',"Illegal lambda name: please input a string in quotes",'lambda',row,col);
+        if (ip_ValidateLambdaName(GridID, row, col, formulaString)) ip_GridProps[GridID].lambdaNamespace.set(lambdaCellCoord, formulaString);
+    } else {
+        //user defined formula for a lambda function
+        formulaString = "=lambda(";
+        //parameters of the lambda function (0 - args, 1 - body, 2 - return cell)
+        //rebuild the formula text written by the user
+        for (var i = 0; i < fxRanges.length; i++) {
+            if (typeof (fxRanges[i]) == 'object') {
+                var range = fxRanges[i];
+                if (typeof (range) == 'string') {
+                    range = ip_fxRangeObject(GridID, row, col, range);
+                }
+                var rangeString = ip_fxRangeToString(GridID, range);
+                formulaString += rangeString + ",";
+            } else {
+                throw ip_fxException('1', "Inputs are incorrect, they must be ranges", 'lambda', row, col);
+            }
         }
-        else { throw ip_fxException('1', "Inputs are incorrect, they must be ranges", 'lambda', row, col); }
-
+        formulaString = formulaString.slice(0, -1) + ")"; //reconstruct the original user defined formula string
     }
-
-    formulaString = formulaString.slice(0, -1) + ")"; //reconstruct the original user defined formula string
 
     //the coordinate of the cell that holds the lambda definition in the underscore notation (e.g. A_0)
     var lambdaCoord = ip_ColumnSymboldCharCode(col) + '_' + row;
@@ -16407,8 +16431,6 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
 
     //reset the background colour of the previously defined lambda cells
     ip_ResetLambdaCells(GridID, row, col);
-    //lambda definition cell coordinate in A1 notation
-    var lambdaCellCoord = ip_ColumnSymboldCharCode(col)+row;
     //add lambda and its cells coordinates to the map of all defined lambdas
     ip_GridProps[GridID].lambdaCells.set(lambdaCellCoord, {
         lambda: ip_fxRangeObject(GridID, row, col, lambdaCellCoord),
@@ -16423,6 +16445,19 @@ function ip_fxLambda(GridID, row, col,  fxRanges) {
 
     return formulaString;
 
+}
+
+function ip_ValidateLambdaName(GridID, row, col, lambdaName) {//validate user-defined lambda function name
+    if (!lambdaName) throw ip_fxException('1',"Illegal lambda name: cannot be empty",'lambda',row,col);
+    else if (/^_/.test(lambdaName)) throw ip_fxException('1',"Illegal lambda name: cannot start with underscore",'lambda',row,col);
+    else if (/^\s/.test(lambdaName)) throw ip_fxException('1',"Illegal lambda name: cannot start with space",'lambda',row,col);
+    else if (/\d/.test(lambdaName)) throw ip_fxException('1',"Illegal lambda name: cannot contain numbers",'lambda',row,col);
+    else if (lambdaName.toLowerCase() in ip_GridProps[GridID].fxList) throw ip_fxException('1',"Illegal lambda name: reserved word",'lambda',row,col);
+    else if (ip_GridProps[GridID].lambdaNamespace.size !== 0 && Array.from(ip_GridProps[GridID].lambdaNamespace.values()).includes(lambdaName.toLowerCase())) {
+        if (!ip_GridProps[GridID].lambdaNamespace.has(ip_ColumnSymboldCharCode(col)+row))
+            throw ip_fxException('1',"Illegal lambda name: function already exists",'lambda',row,col);
+    }
+    else return true;
 }
 
 function ip_BuildLambdaFunc(lambdaParams) {
@@ -16568,7 +16603,6 @@ function ip_LambdaCellsStyle(GridID, dict, color) {
         var value = dict[key]; //the cell coordinate of a lambda constituent
         for (let r = value.startRow; r <= value.endRow; r++) {
             for (let c = value.startCol; c <= value.endCol; c++) {
-                var cell = ip_GridProps[GridID].rowData[r].cells[c];
                 //set the background colour of the current cell
                 ip_SetCellFormat(GridID, { row: r, col: c, style: "background-color:"+hue+";" });
             }
