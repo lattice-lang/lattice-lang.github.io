@@ -6643,6 +6643,7 @@ function ip_SetupFx(GridID) {
     $('#' + GridID).ip_AddFormula({ formulaName: 'range', functionName: 'ip_fxRange', tip: 'Specifies a range of cells, by default the first cell in range is returned.', inputs: '[row][col]:[row][col]', example: 'A1 or A1:B5' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'count', functionName: 'ip_fxCount', tip: 'Counts the number of cells which have numeric values. Ignores cells that are empty or text.', inputs: '(range1, range2, ... )', example: 'count( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'sum', functionName: 'ip_fxSum', tip: 'Adds the numbers in a range. Ignores cells that are empty or text.', inputs: '( range1, range2, ... )', example: 'sum( a1, b1:b5, a3 )' });
+    $('#' + GridID).ip_AddFormula({ formulaName: 'round', functionName: 'ip_fxRound', tip: 'Rounds a number to a specified number of decimal places. dec_places is optional - 0 by default.', inputs: '( number, dec_places )', example: 'round( 5.678, 2 ) -> 5.68' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'concat', functionName: 'ip_fxConcat', tip: 'Joins the values of cells into one text string.', inputs: '( range1, range2, ... )', example: 'concat( a1, b1:b5, a3 )' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'length', functionName: 'ip_fxLength', tip: 'Returns the length of a string.', inputs: '( string )', example: 'length( "hello" ) -> 5' });
     $('#' + GridID).ip_AddFormula({ formulaName: 'head', functionName: 'ip_fxHead', tip: 'Returns the head of the string (leftmost character of a string).', inputs: '( string )', example: 'head("mystring") -> "m"' });
@@ -15897,6 +15898,47 @@ function ip_fxSum(GridID, row, col, fxRanges) {
         else { throw ip_fxException('1', "Inputs are incorrect, they must be numbers or ranges", 'sum', row, col); }
 
     }
+
+    return value;
+
+}
+
+function ip_fxRound(GridID, row, col, fxRanges) {
+
+    //fxRanges is an array of ranges e.g. ip_rangeObject and joins the values, max 500 chars
+    if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'round', row, col); }
+
+    let value = 0;
+    let decimal_places = 0;
+    GridID = arguments[0];
+    row = arguments[1];
+    col = arguments[2];
+    fxRanges = Array.prototype.slice.call(arguments).splice(3);
+
+    //the round function must receive at least 1 and a maximum of 2 arguments
+    if (fxRanges.length > 2) { throw ip_fxException('1',"Please provide a maximum of 2 arguments",'round',row,col); }
+    //if decimal_places argument is supplied, test if it is a number and convert it to integer, otherwise throw an error
+    if (fxRanges.length === 2 && isNaN(fxRanges[1])) throw ip_fxException('1',"The number of decimal places must be an integer",'round',row,col);
+    else decimal_places = parseInt(fxRanges[1]);
+
+    //if the user input is a coordinate
+    if (typeof (fxRanges[0]) == 'object') {
+        let range = fxRanges[0];
+        const r = range.startRow;
+        const c = range.startCol;
+        if (typeof (range) == 'string') { range = ip_fxRangeObject(GridID, row, col, range); }
+        //throw an exception if the row data is not loaded
+        if (ip_GridProps[GridID].rowData[r].loading) { throw ip_fxException('1', 'Row data not loaded', 'round', row, col); }
+        //throw an exception if a circular dependency is detected
+        if (r === row && c === col) { throw ip_fxException('1', "Circular dependency detected, your formula range may not include the cell that contains the formula", 'round', row, col); }
+        const val = ip_CellDataType(GridID, r, c, true);
+        if (val.display != null && ip_fxValidateCellHashTags(GridID, r, c, range.hashtags)) {
+            value = Number(val.display).toFixed(decimal_places);
+        }
+    }
+    //else, if the user input is a number, round it to the specified number of decimal places
+    else if (!isNaN(fxRanges[0])) value = Number(fxRanges[0]).toFixed(decimal_places);
+    else throw ip_fxException('1', "Input is incorrect, the value to round must be a number or a coordinate", 'round', row, col);
 
     return value;
 
