@@ -16613,9 +16613,9 @@ function ip_BuildLambdaFunc(lambdaParams) {
 
 function ip_ReplaceCellCoordWithValue(args, formula) {
     //a pattern to look for in the formula: argument coordinates (e.g. 'A0|B0')
-    let re = new RegExp(Array.from(args.keys()).flat().join('|'),'g');
+    let re = new RegExp(Array.from(args.keys()).flat().join('|'),'gi');
     //replace every instance of arg coord in the formula with their values
-    return formula.replace(re, match=>args.get(match));
+    return formula.replace(re, match=>args.get(match.toUpperCase()));
 }
 
 function ip_ExpandRangeToSingleCoords(GridID, row, col, formula) {
