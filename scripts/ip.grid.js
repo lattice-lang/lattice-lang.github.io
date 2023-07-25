@@ -4798,6 +4798,23 @@ var thisBrowser = ip_Browser();
 
     //----- DATA OBJECTS --------------------------------------------------------------------------------------------------------------------------------------------------
 
+    $.fn.ip_LoadDataFromQueryString = function () {
+        var GridID = $(this).attr('id');
+        //extract the query string from the URL
+        const queryString = window.location.search;
+        //convert query string into URLSearchParams object
+        let urlParams = new URLSearchParams(queryString);
+        //input data into the grid cells
+        for (let [key, value] of urlParams) {
+            let range = ip_fxRangeObject(GridID, null, null, key);
+            if (range!==null) {
+                let r = range.startRow;
+                let c = range.startCol;
+                let val = urlParams.get(key);
+                ip_CellInput(GridID, {row: r, col: c, valueRAW: val});
+            }
+        }
+    }
 
     $.fn.ip_gridProperties = function (options) {
 
