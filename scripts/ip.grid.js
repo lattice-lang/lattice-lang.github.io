@@ -1764,8 +1764,6 @@ var thisBrowser = ip_Browser();
 
             $('#' + GridID).ip_RangeHighlight({ range: arrRange[i], multiselect: true, fadeIn: true, highlightType: (options.cut ? 'ip_grid_cell_rangeHighlight_cut' : 'ip_grid_cell_rangeHighlight_copy') });
 
-            //if (options.toClipBoard) { ip_CopyToClipboard(GridID); }
-
             ip_GridProps[GridID].cut = options.cut;
         }
 
@@ -4798,24 +4796,6 @@ var thisBrowser = ip_Browser();
 
     //----- DATA OBJECTS --------------------------------------------------------------------------------------------------------------------------------------------------
 
-    $.fn.ip_LoadDataFromQueryString = function () {
-        var GridID = $(this).attr('id');
-        //extract the query string from the URL
-        const queryString = window.location.search;
-        //convert query string into URLSearchParams object
-        let urlParams = new URLSearchParams(queryString);
-        //input data into the grid cells
-        for (let [key, value] of urlParams) {
-            let range = ip_fxRangeObject(GridID, null, null, key);
-            if (range!==null) {
-                let r = range.startRow;
-                let c = range.startCol;
-                let val = urlParams.get(key);
-                ip_CellInput(GridID, {row: r, col: c, valueRAW: val});
-            }
-        }
-    }
-
     $.fn.ip_gridProperties = function (options) {
 
         var dimensions = $.extend({
@@ -5902,6 +5882,24 @@ function ip_ColumnSymboldCharCode(number) {
 }
 
 //----- INITIALIZATION ------------------------------------------------------------------------------------------------------------------------------------
+
+$.fn.ip_LoadDataFromQueryString = function () {
+    var GridID = $(this).attr('id');
+    //extract the query string from the URL
+    const queryString = window.location.search;
+    //convert query string into URLSearchParams object
+    let urlParams = new URLSearchParams(queryString);
+    //input data into the grid cells
+    for (let [key, value] of urlParams) {
+        let range = ip_fxRangeObject(GridID, null, null, key);
+        if (range!==null) {
+            let r = range.startRow;
+            let c = range.startCol;
+            let val = urlParams.get(key);
+            ip_CellInput(GridID, {row: r, col: c, valueRAW: val});
+        }
+    }
+}
 
 function ip_SetupEvents(GridID) {
       
@@ -12912,14 +12910,6 @@ function ip_ReRenderValues(GridID, rowData, fromRow, fromCol, toRow, toCol) {
 
 }
 
-function ip_CopyToClipboard(GridID) {
-
-    //window.clipboardData.setData("Text", text);
-
-
-
-}
-
 function ip_KeyDownLoop(GridID, e, loopCounter, row, col) {
 
     if (ip_GridProps[GridID].timeouts.keyDownTimeout == null) { ip_GridProps[GridID].timeouts.keyDownTimeout = 0; }
@@ -18009,6 +17999,25 @@ function ip_formatCurrency(GridID, value, oldMask, newMask, decimals) {
 
 
 //----- SPECIFIC FUNCTIONS FOR IP GRID ------------------------------------------------------------------------------------------------------------------------------------
+
+function ip_EncodeCellData(GridID) {
+    //extract data (value or formula) from non-empty cells & encode it
+    let result = '';
+    let rows = ip_GridProps[GridID].rowData;
+    for (const [r,row] of rows.entries()) {
+        for (const [c,cell] of row.cells.entries()) {
+            let coord = ip_ColumnSymboldCharCode(c)+r;
+            let formula = cell.formula;
+            let value = cell.value;
+            if (!(formula === "" || formula === null || formula === undefined)) {
+                result += '&'+coord+'='+encodeURIComponent(formula);
+            } else {
+                if (!(value === "" || value === null || value === undefined)) result += '&'+coord+'='+encodeURIComponent(value);
+            }
+        }
+    }
+    return result;
+}
 
 function ip_FocusGrid(GridID, raiseEvent) {
 
