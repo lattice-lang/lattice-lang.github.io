@@ -12,9 +12,16 @@
     $(document).ready(function () {
 
       $('#demo').ip_Grid({ rows: 1000,  cols: 26 });
+      $('#demo').ip_LoadDataFromQueryString();
 
     });
-
+    function copyToClipboard() {
+      const copyText = ip_EncodeCellData('demo');
+      navigator.clipboard.writeText(copyText).then(() => {
+        $( "#popUp" ).show();
+        setTimeout(function() { $( "#popUp" ).hide(); }, 2000);
+      });
+    }
   </script>
 
   <style>
@@ -28,6 +35,31 @@
     }
 
     a { color:#46b3ff; text-decoration:dotted; }
+
+    #eg {
+      border-style: outset;
+      border-width: 2.5px;
+      border-color: black;
+      background-color: #666666;
+      padding: 5px 10px;
+      font-size: 14px;
+      color: #8fc7ef;
+    }
+
+    #btn {
+      box-shadow: none;
+      border-radius: 0px;
+      background: #8fc7ef none;
+      padding: 5px 10px;
+      font-size: 14px;
+      color: #4d4d4d;
+    }
+
+    #popUp {
+      color: #79d2a0;
+      font-style: oblique 15deg;
+      font-weight: bold;
+    }
 
     .gridContainer {
 
@@ -57,6 +89,18 @@
 
 <h1>Lattice</h1>
 <p>Available standard functions: <b style="color:#a8dcf0">concat, count, date, day, dropdown, gantt, head, if, lambda, length, max, min, range, round, sum, tail, today</b>.</p>
+<p>
+  <a id="eg" href="example.html?
+a10=%3Dlambda(B10%2CB11%3AB13%2CB13%2C%22convert%22)&a16=%3Dlambda(B16%2CB17%2CB17%2C%22describe%22)
+&a0=t%20in%20F&a1=8&a2=32&a3=98&a4=67&a5=50&a6=78&a7=37&b0=t%20in%20C&c0=description&
+a11=step_1&a12=step_2&a13=step_3&b10=212&a17=temperature%20is&b16=0&b11=%3DB10-32&b12=%3DB11%2F1.8&b13=%3Dround(B12%2C1)
+&b17=%3Dif(B16%3E25%2C%22hot%22%2Cif(B16%3E15%2C%22warm%22%2Cif(B16%3E0%2C%22cold%22%2Cif(B16%3C%3D0%2C%22freezing%22%2C%22error%22))))
+&b1=%3Dconvert(A1)&b2=%3Dconvert(A2)&b3=%3Dconvert(A3)&b4=%3Dconvert(A4)&b5=%3Dconvert(A5)&b6=%3Dconvert(A6)&b7=%3Dconvert(A7)
+&c1=%3Ddescribe(B1)&c2=%3Ddescribe(B2)&c3=%3Ddescribe(B3)&c4=%3Ddescribe(B4)&c5=%3Ddescribe(B5)&c6=%3Ddescribe(B6)&c7=%3Ddescribe(B7)"
+       target="_blank" rel="noopener noreferrer"><b>EXAMPLE PROGRAM</b></a>&nbsp;&nbsp;&nbsp;
+  <button id="btn" onclick="copyToClipboard()"><b>COPY CONTENTS</b></button>&nbsp;&nbsp;&nbsp;
+  <span id="popUp" style="display: none;"> copied to clipboard! </span>
+</p>
 <div class="gridContainer">
   <div id="demo"></div>
 </div>

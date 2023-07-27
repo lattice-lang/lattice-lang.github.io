@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="scripts/jquery-ui-1.9.2.custom.min.js"></script>
+  <script src="scripts/ip.grid.js"></script>
+  <link href="css/ip.grid.css" rel="stylesheet" />
+  <link href="favicon.ico?v=M44lzPylqQ" rel="icon" />
+
+  <script>
+
+    $(document).ready(function () {
+
+      $('#demo').ip_Grid({ rows: 1000,  cols: 26 });
+      $('#demo').ip_LoadDataFromQueryString();
+
+    });
+
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: white;
+      background-color: #3d3d3d;
+      margin: 0;
+      padding: 60px;
+      position:relative;
+    }
+
+    a { color:#46b3ff; text-decoration:dotted; }
+
+    .gridContainer {
+
+      position:relative;
+      width:100%;
+      height:70vh;
+    }
+
+    #demo {
+
+      width:100%;
+      height:100%;
+    }
+
+    .sub_div {
+
+      font-size: 13px;
+      position: absolute;
+      bottom: 0;
+    }
+  </style>
+
+  <title>lattice-lang</title>
+
+</head>
+<body>
+
+<h1>Lattice - Example</h1>
+<p>Available standard functions: <b style="color:#a8dcf0">concat, count, date, day, dropdown, gantt, head, if, lambda, length, max, min, range, round, sum, tail, today</b>.</p>
+<p>This example program converts temperature from Fahrenheit (&#x2109;) to Celsius (&#x2103;) and describes it with a suitable adjective.</p>
+<div class="gridContainer">
+  <div id="demo"></div>
+</div>
+<div class="sub_div">
+  <p style="padding: 0px 25px;">&copy; This enhanced spreadsheet is based on <a href="https://github.com/marzsocks/ipgrid" target="_blank" rel="noopener noreferrer">ipgrid</a> by Michael Roberg <br>
+    &copy; The favicon is <a href="https://www.flaticon.com/free-icon/hashtag_9595849" target="_blank" rel="noopener noreferrer">by vectaicon</a> - Flaticon</p>
+</div>
+</body>
+</html>
