@@ -5884,21 +5884,38 @@ function ip_ColumnSymboldCharCode(number) {
 //----- INITIALIZATION ------------------------------------------------------------------------------------------------------------------------------------
 
 $.fn.ip_LoadDataFromQueryString = function () {
+
     var GridID = $(this).attr('id');
     //extract the query string from the URL
     const queryString = window.location.search;
     //convert query string into URLSearchParams object
     let urlParams = new URLSearchParams(queryString);
     //input data into the grid cells
-    for (let [key, value] of urlParams) {
+    urlParams.forEach((value, key) => {
         let range = ip_fxRangeObject(GridID, null, null, key);
         if (range!==null) {
             let r = range.startRow;
             let c = range.startCol;
-            let val = urlParams.get(key);
-            ip_CellInput(GridID, {row: r, col: c, valueRAW: val});
+            ip_ProcessInputDataFromQueryString(GridID, r, c, value);
         }
-    }
+    });
+
+}
+
+function ip_ProcessInputDataFromQueryString(GridID, r, c, value) {
+
+    let silcrow = '\u00A7'; // encoded '§' symbol as a delimiter
+    let input = value.split(silcrow); //e.g. 'value§hello' -> ['value', 'hello']
+    //if the input is a value or a formula, input it into the relevant cell
+    if (input[0] === 'value' || input[0] === 'formula')
+        ip_CellInput(GridID, {row: r, col: c, valueRAW: input[1]});
+    //if the input is rowHeight, change the height of the relevant row
+    else if (input[0] === 'rowHeight')
+        $('#'+GridID).ip_ResizeRow({rows: [r], size: input[1]});
+    //if the input is colWidth, change the width of the relevant column
+    else if (input[0] === 'colWidth')
+        $('#'+GridID).ip_ResizeColumn({columns: [c], size: input[1]});
+
 }
 
 function ip_SetupEvents(GridID) {
@@ -18000,8 +18017,9 @@ function ip_formatCurrency(GridID, value, oldMask, newMask, decimals) {
 
 //----- SPECIFIC FUNCTIONS FOR IP GRID ------------------------------------------------------------------------------------------------------------------------------------
 
-function ip_EncodeCellData(GridID) {
-    //extract data (value or formula) from non-empty cells & encode it
+function ip_GenerateQueryStringFromGridData(GridID) {
+
+    //extract data (value/formula/row height/col width) from non-empty cells & encode it
     let result = '';
     let rows = ip_GridProps[GridID].rowData;
     for (const [r,row] of rows.entries()) {
@@ -18009,14 +18027,32 @@ function ip_EncodeCellData(GridID) {
             let coord = ip_ColumnSymboldCharCode(c)+r;
             let formula = cell.formula;
             let value = cell.value;
-            if (!(formula === "" || formula === null || formula === undefined)) {
-                result += '&'+coord+'='+encodeURIComponent(formula);
-            } else {
-                if (!(value === "" || value === null || value === undefined)) result += '&'+coord+'='+encodeURIComponent(value);
-            }
+            let rowHeight = row.height;
+            let colWidth = ip_GridProps[GridID].colData[c].width;
+            //if the formula is not falsy, encode it and append to the query string (e.g. '&A0=formula'+encoded(§=1+2))
+            if (!(formula === "" || formula === null || formula === undefined))
+                result += ip_BuildFinalResultString(coord, 'formula', formula, rowHeight, colWidth);
+            //if the value is not falsy, encode it and append to the query string (e.g. '&A1=value'+encoded(§hello))
+            else if (!(value === "" || value === null || value === undefined))
+                result += ip_BuildFinalResultString(coord, 'value', value, rowHeight, colWidth);
         }
     }
     return result;
+
+}
+
+function ip_BuildFinalResultString(coord, type, input, rowHeight, colWidth) {
+
+    let silcrow = '%C2%A7'; // encoded '§' symbol as a delimiter
+    let result = '';
+    result = '&' + coord + '=' + type + silcrow + encodeURIComponent(input);
+    //if the row height is different from the default (25), encode it and append to the query string (e.g. '&A0=rowHeight'+encoded(§70))
+    if (rowHeight !== defaultRowHeight) result += '&' + coord + '=rowHeight' + silcrow + encodeURIComponent(rowHeight);
+    //if the col height is different from the default (100), encode it and append to the query string (e.g. '&A1=colWidth'+encoded(§170))
+    if (colWidth !== defaultColWidth) result += '&' + coord + '=colWidth' + silcrow + encodeURIComponent(colWidth);
+
+    return result;
+
 }
 
 function ip_FocusGrid(GridID, raiseEvent) {
