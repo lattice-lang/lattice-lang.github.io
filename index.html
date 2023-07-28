@@ -8,19 +8,21 @@
   <link href="favicon.ico?v=M44lzPylqQ" rel="icon" />
 
   <script>
+    function buildRedirectLink() {
+      let sheet_url = "sheet.html";
+      //get the value of the input text box
+      const text_input = document.getElementById("text_field").value;
+      //if the text box is not empty, append its value to 'sheet.html' as a query string
+      if (text_input.length !== 0) sheet_url += '?' + text_input;
+      //use the resulting link to load the spreadsheet
+      $("#grid_link").attr("href", sheet_url);
+    }
 
-    $(document).ready(function () {
-
-      $('#demo').ip_Grid({ rows: 1000,  cols: 26 });
-      $('#demo').ip_LoadDataFromQueryString();
-
-    });
-    function copyToClipboard() {
-      const copyText = ip_GenerateQueryStringFromGridData('demo');
-      navigator.clipboard.writeText(copyText).then(() => {
-        $( "#popUp" ).show();
-        setTimeout(function() { $( "#popUp" ).hide(); }, 2000);
-      });
+    function getExampleProgramString(number) {
+      let queryStr = '';
+      if (number === 1) queryStr = '&B3=value%C2%A7x&B3=colWidth%C2%A7146&C3=value%C2%A73&C3=colWidth%C2%A7208&B4=value%C2%A7y&B4=colWidth%C2%A7146&C4=value%C2%A74&C4=colWidth%C2%A7208&B5=value%C2%A7x%5E2&B5=colWidth%C2%A7146&C5=formula%C2%A7%3DC3*C3&C5=colWidth%C2%A7208&B6=value%C2%A7y%5E2&B6=colWidth%C2%A7146&C6=formula%C2%A7%3DC4*C4&C6=colWidth%C2%A7208&B7=value%C2%A7x%5E2%C2%A0%2B%C2%A0y%5E2&B7=colWidth%C2%A7146&C7=formula%C2%A7%3Dsum(C5%3AC6)&C7=colWidth%C2%A7208&C8=formula%C2%A7%3Dlambda(C3%3AC4%2CC5%3AC7%2CC7%2C\'sum_of_squares\')&C8=colWidth%C2%A7208&B11=value%C2%A7sum_of_squares(2%2C3)&B11=colWidth%C2%A7146&C11=formula%C2%A7%3Dsum_of_squares(2%2C3)&C11=colWidth%C2%A7208&B12=value%C2%A7C8(5%2C6)&B12=colWidth%C2%A7146&C12=formula%C2%A7%3DC8(5%2C6)&C12=colWidth%C2%A7208';
+      else if (number === 2) queryStr = '&A0=value%C2%A7Function_1&F0=value%C2%A7Function_2&K0=value%C2%A7Note%3A&L0=value%C2%A7This%20example%20program%20converts%20temperature%20from%20Fahrenheit%20(%26%23x2109%3B)%20to%20Celsius%20(%26%23x2103%3B)%20and%20describes%20it%20with%20a%20suitable%20adjective.&L0=colWidth%C2%A7751&A2=formula%C2%A7%3Dlambda(B2%2CB3%3AB5%2CB5%2C%22convert%22)&B2=value%C2%A7212&F2=formula%C2%A7%3Dlambda(G2%2CG3%2CG3%2C%22describe%22)&G2=value%C2%A70&A3=value%C2%A7step_1&B3=formula%C2%A7%3DB2-32&F3=value%C2%A7temperature%20is&G3=formula%C2%A7%3Dif(G2%3E25%2C%22hot%22%2Cif(G2%3E15%2C%22warm%22%2Cif(G2%3E0%2C%22cold%22%2Cif(G2%3C%3D0%2C%22freezing%22%2C%22error%22))))&A4=value%C2%A7step_2&B4=formula%C2%A7%3DB3%2F1.8&A5=value%C2%A7step_3&B5=formula%C2%A7%3Dround(B4%2C1)&A9=value%C2%A7Test%C2%A0Data&A11=value%C2%A7t%20in%20F&B11=value%C2%A7t%20in%20C&C11=value%C2%A7description&A12=value%C2%A78&B12=formula%C2%A7%3Dconvert(A12)&C12=formula%C2%A7%3Ddescribe(B12)&A13=value%C2%A732&B13=formula%C2%A7%3Dconvert(A13)&C13=formula%C2%A7%3Ddescribe(B13)&A14=value%C2%A798&B14=formula%C2%A7%3Dconvert(A14)&C14=formula%C2%A7%3Ddescribe(B14)&A15=value%C2%A767&B15=formula%C2%A7%3Dconvert(A15)&C15=formula%C2%A7%3Ddescribe(B15)&A16=value%C2%A750&B16=formula%C2%A7%3Dconvert(A16)&C16=formula%C2%A7%3Ddescribe(B16)&A17=value%C2%A778&B17=formula%C2%A7%3Dconvert(A17)&C17=formula%C2%A7%3Ddescribe(B17)&A18=value%C2%A737&B18=formula%C2%A7%3Dconvert(A18)&C18=formula%C2%A7%3Ddescribe(B18)';
+      document.getElementById("text_field").value = queryStr;
     }
   </script>
 
@@ -30,82 +32,108 @@
       color: white;
       background-color: #3d3d3d;
       margin: 0;
-      padding: 60px;
+      padding: 50px 100px;
       position:relative;
     }
 
     a { color:#46b3ff; text-decoration:dotted; }
 
-    #eg {
-      border-style: outset;
-      border-width: 2.5px;
+    #text_field {
+      width: 15%;
+      padding: 5px 10px;
+    }
+
+    input:placeholder-shown {
+      font-style: italic;
+    }
+
+    #grid_link {
       border-color: black;
       background-color: #666666;
       padding: 5px 10px;
       font-size: 14px;
-      color: #8fc7ef;
+      letter-spacing: 2px;
     }
 
-    #btn {
+
+    button {
       box-shadow: none;
       border-radius: 0px;
       background: #8fc7ef none;
       padding: 5px 10px;
       font-size: 14px;
       color: #4d4d4d;
-    }
-
-    #popUp {
-      color: #79d2a0;
-      font-style: oblique 15deg;
-      font-weight: bold;
+      letter-spacing: 2px;
     }
 
     .gridContainer {
-
-      position:relative;
-      width:100%;
-      height:70vh;
+      position: relative;
+      width: 100%;
+      height: 70vh;
     }
 
     #demo {
-
-      width:100%;
-      height:100%;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
     }
 
-    .sub_div {
+    #lambda-img { width: 45%; }
 
+    .float-child {
+      margin: 0;
+      padding: 30px;
+      position: absolute;
+      top: 50%;
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+      font-size: 20px;
+    }
+
+    li { line-height: 1.5; }
+
+    .sub_div {
       font-size: 13px;
       position: absolute;
       bottom: 0;
     }
   </style>
 
-  <title>lattice-lang</title>
+  <title>lattice-home</title>
 
 </head>
 <body>
 
-<h1>Lattice</h1>
-<p>Available standard functions: <b style="color:#a8dcf0">concat, count, date, day, dropdown, gantt, head, if, lambda, length, max, min, range, round, sum, tail, today</b>.</p>
+<h1>Lattice - Homepage</h1>
+<p id="grid_link_line">
+  <input id="text_field" type="text" placeholder="Enter the program you wish to load here (optional)" onClick="this.select();">&nbsp;&nbsp;&nbsp;
+  <a id="grid_link" href="#" onclick="buildRedirectLink();" target="_blank" rel="noopener noreferrer"><b>GO TO SPREADSHEET</b></a>&nbsp;&nbsp;&nbsp;
+</p>
 <p>
-  <a id="eg" href="example.html?
-&A0=value%C2%A7Function_1&F0=value%C2%A7Function_2&K0=value%C2%A7Note%3A
-&L0=value%C2%A7This%20example%20program%20converts%20temperature%20from%20Fahrenheit%20(%26%23x2109%3B)%20to%20Celsius%20(%26%23x2103%3B)%20and%20describes%20it%20with%20a%20suitable%20adjective.
-&L0=colWidth%C2%A7751&A2=formula%C2%A7%3Dlambda(B2%2CB3%3AB5%2CB5%2C%22convert%22)&B2=value%C2%A7212&F2=formula%C2%A7%3Dlambda(G2%2CG3%2CG3%2C%22describe%22)&G2=value%C2%A70&A3=value%C2%A7step_1
-&B3=formula%C2%A7%3DB2-32&F3=value%C2%A7temperature%20is&G3=formula%C2%A7%3Dif(G2%3E25%2C%22hot%22%2Cif(G2%3E15%2C%22warm%22%2Cif(G2%3E0%2C%22cold%22%2Cif(G2%3C%3D0%2C%22freezing%22%2C%22error%22))))
-&A4=value%C2%A7step_2&B4=formula%C2%A7%3DB3%2F1.8&A5=value%C2%A7step_3&B5=formula%C2%A7%3Dround(B4%2C1)&A9=value%C2%A7Test%C2%A0Data&A11=value%C2%A7t%20in%20F&B11=value%C2%A7t%20in%20C
-&C11=value%C2%A7description&A12=value%C2%A78&B12=formula%C2%A7%3Dconvert(A12)&C12=formula%C2%A7%3Ddescribe(B12)&A13=value%C2%A732&B13=formula%C2%A7%3Dconvert(A13)&C13=formula%C2%A7%3Ddescribe(B13)
-&A14=value%C2%A798&B14=formula%C2%A7%3Dconvert(A14)&C14=formula%C2%A7%3Ddescribe(B14)&A15=value%C2%A767&B15=formula%C2%A7%3Dconvert(A15)&C15=formula%C2%A7%3Ddescribe(B15)&A16=value%C2%A750
-&B16=formula%C2%A7%3Dconvert(A16)&C16=formula%C2%A7%3Ddescribe(B16)&A17=value%C2%A778&B17=formula%C2%A7%3Dconvert(A17)&C17=formula%C2%A7%3Ddescribe(B17)&A18=value%C2%A737&B18=formula%C2%A7%3Dconvert(A18)
-&C18=formula%C2%A7%3Ddescribe(B18)"
-       target="_blank" rel="noopener noreferrer"><b>EXAMPLE PROGRAM</b></a>&nbsp;&nbsp;&nbsp;
-  <button id="btn" onclick="copyToClipboard()"><b>COPY CONTENTS</b></button>&nbsp;&nbsp;&nbsp;
-  <span id="popUp" style="display: none;"> copied to clipboard! </span>
+  <button id="eg1" onclick="getExampleProgramString(1)"><b>SUM OF SQUARES</b></button>&nbsp;&nbsp;&nbsp;
+  <button id="eg2" onclick="getExampleProgramString(2)"><b>TEMPERATURE</b></button>
 </p>
 <div class="gridContainer">
-  <div id="demo"></div>
+  <div id="demo">
+    <div ><img id ="lambda-img" class="float-child" src="lambda-example.png" alt="Example Program in Lattice"></div>
+    <div>
+      <ul class="float-child">
+        <li>Welcome to our research tool - Lattice!</li>
+        <li>The image to the left illustrates an example of a lambda function definition in Lattice.
+          <ul>
+            <li>C8 - formula to define a lambda;</li>
+            <li>C3:C4 - the input values of the function;</li>
+            <li>C5:C7 - the function body that contains the necessary calculation steps;</li>
+            <li>C7 - the return value of the lambda, which is part of the body;</li>
+            <li>C11:C12 - function calls that test the lambda with two combinations of inputs.</li>
+          </ul>
+        </li>
+        <li>This example program calculates the sum of the squares of two given numbers.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 <div class="sub_div">
   <p>&copy; This enhanced spreadsheet is based on <a href="https://github.com/marzsocks/ipgrid" target="_blank" rel="noopener noreferrer">ipgrid</a> by Michael Roberg <br>
