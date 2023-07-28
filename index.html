@@ -16,7 +16,7 @@
 
     });
     function copyToClipboard() {
-      const copyText = ip_EncodeCellData('demo');
+      const copyText = ip_GenerateQueryStringFromGridData('demo');
       navigator.clipboard.writeText(copyText).then(() => {
         $( "#popUp" ).show();
         setTimeout(function() { $( "#popUp" ).hide(); }, 2000);
@@ -91,12 +91,15 @@
 <p>Available standard functions: <b style="color:#a8dcf0">concat, count, date, day, dropdown, gantt, head, if, lambda, length, max, min, range, round, sum, tail, today</b>.</p>
 <p>
   <a id="eg" href="example.html?
-a10=%3Dlambda(B10%2CB11%3AB13%2CB13%2C%22convert%22)&a16=%3Dlambda(B16%2CB17%2CB17%2C%22describe%22)
-&a0=t%20in%20F&a1=8&a2=32&a3=98&a4=67&a5=50&a6=78&a7=37&b0=t%20in%20C&c0=description&
-a11=step_1&a12=step_2&a13=step_3&b10=212&a17=temperature%20is&b16=0&b11=%3DB10-32&b12=%3DB11%2F1.8&b13=%3Dround(B12%2C1)
-&b17=%3Dif(B16%3E25%2C%22hot%22%2Cif(B16%3E15%2C%22warm%22%2Cif(B16%3E0%2C%22cold%22%2Cif(B16%3C%3D0%2C%22freezing%22%2C%22error%22))))
-&b1=%3Dconvert(A1)&b2=%3Dconvert(A2)&b3=%3Dconvert(A3)&b4=%3Dconvert(A4)&b5=%3Dconvert(A5)&b6=%3Dconvert(A6)&b7=%3Dconvert(A7)
-&c1=%3Ddescribe(B1)&c2=%3Ddescribe(B2)&c3=%3Ddescribe(B3)&c4=%3Ddescribe(B4)&c5=%3Ddescribe(B5)&c6=%3Ddescribe(B6)&c7=%3Ddescribe(B7)"
+&A0=value%C2%A7Function_1&F0=value%C2%A7Function_2&K0=value%C2%A7Note%3A
+&L0=value%C2%A7This%20example%20program%20converts%20temperature%20from%20Fahrenheit%20(%26%23x2109%3B)%20to%20Celsius%20(%26%23x2103%3B)%20and%20describes%20it%20with%20a%20suitable%20adjective.
+&L0=colWidth%C2%A7751&A2=formula%C2%A7%3Dlambda(B2%2CB3%3AB5%2CB5%2C%22convert%22)&B2=value%C2%A7212&F2=formula%C2%A7%3Dlambda(G2%2CG3%2CG3%2C%22describe%22)&G2=value%C2%A70&A3=value%C2%A7step_1
+&B3=formula%C2%A7%3DB2-32&F3=value%C2%A7temperature%20is&G3=formula%C2%A7%3Dif(G2%3E25%2C%22hot%22%2Cif(G2%3E15%2C%22warm%22%2Cif(G2%3E0%2C%22cold%22%2Cif(G2%3C%3D0%2C%22freezing%22%2C%22error%22))))
+&A4=value%C2%A7step_2&B4=formula%C2%A7%3DB3%2F1.8&A5=value%C2%A7step_3&B5=formula%C2%A7%3Dround(B4%2C1)&A9=value%C2%A7Test%C2%A0Data&A11=value%C2%A7t%20in%20F&B11=value%C2%A7t%20in%20C
+&C11=value%C2%A7description&A12=value%C2%A78&B12=formula%C2%A7%3Dconvert(A12)&C12=formula%C2%A7%3Ddescribe(B12)&A13=value%C2%A732&B13=formula%C2%A7%3Dconvert(A13)&C13=formula%C2%A7%3Ddescribe(B13)
+&A14=value%C2%A798&B14=formula%C2%A7%3Dconvert(A14)&C14=formula%C2%A7%3Ddescribe(B14)&A15=value%C2%A767&B15=formula%C2%A7%3Dconvert(A15)&C15=formula%C2%A7%3Ddescribe(B15)&A16=value%C2%A750
+&B16=formula%C2%A7%3Dconvert(A16)&C16=formula%C2%A7%3Ddescribe(B16)&A17=value%C2%A778&B17=formula%C2%A7%3Dconvert(A17)&C17=formula%C2%A7%3Ddescribe(B17)&A18=value%C2%A737&B18=formula%C2%A7%3Dconvert(A18)
+&C18=formula%C2%A7%3Ddescribe(B18)"
        target="_blank" rel="noopener noreferrer"><b>EXAMPLE PROGRAM</b></a>&nbsp;&nbsp;&nbsp;
   <button id="btn" onclick="copyToClipboard()"><b>COPY CONTENTS</b></button>&nbsp;&nbsp;&nbsp;
   <span id="popUp" style="display: none;"> copied to clipboard! </span>
