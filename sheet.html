@@ -4,6 +4,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script src="scripts/jquery-ui-1.9.2.custom.min.js"></script>
   <script src="scripts/ip.grid.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="css/ip.grid.css" rel="stylesheet" />
   <link href="favicon.ico?v=M44lzPylqQ" rel="icon" />
 
@@ -15,7 +16,13 @@
       $('#demo').ip_LoadDataFromQueryString();
 
     });
-
+    function copyToClipboard() {
+      const copyText = document.URL + '?' + ip_GenerateQueryStringFromGridData('demo');
+      navigator.clipboard.writeText(copyText).then(() => {
+        $( "#popUp" ).show();
+        setTimeout(function() { $( "#popUp" ).hide(); }, 2000);
+      });
+    }
   </script>
 
   <style>
@@ -24,11 +31,29 @@
       color: white;
       background-color: #3d3d3d;
       margin: 0;
-      padding: 60px;
+      padding: 50px;
       position:relative;
     }
 
-    a { color:#46b3ff; text-decoration:dotted; }
+    a { color:#46b3ff; vertical-align: middle; }
+
+    .material-icons { font-size:40px; }
+
+    #btn {
+      box-shadow: none;
+      border-radius: 0px;
+      background: #8fc7ef none;
+      padding: 5px 10px;
+      font-size: 14px;
+      color: #4d4d4d;
+      letter-spacing: 2px;
+    }
+
+    #popUp {
+      color: #79d2a0;
+      font-style: oblique 15deg;
+      font-weight: bold;
+    }
 
     .gridContainer {
 
@@ -51,19 +76,22 @@
     }
   </style>
 
-  <title>lattice-lang</title>
+  <title>lattice-sheet</title>
 
 </head>
 <body>
 
-<h1>Lattice - Example</h1>
+<h1><a id="home_link" href="index.html" target="_blank" rel="noopener noreferrer"><i class="material-icons">home</i></a>&nbsp;Lattice - Spreadsheet</h1>
 <p>Available standard functions: <b style="color:#a8dcf0">concat, count, date, day, dropdown, gantt, head, if, lambda, length, max, min, range, round, sum, tail, today</b>.</p>
-<p>This example program converts temperature from Fahrenheit (&#x2109;) to Celsius (&#x2103;) and describes it with a suitable adjective.</p>
+<p>
+  <button id="btn" onclick="copyToClipboard()"><b>COPY CONTENTS</b></button>&nbsp;&nbsp;&nbsp;
+  <span id="popUp" style="display: none;"> copied to clipboard! </span>
+</p>
 <div class="gridContainer">
   <div id="demo"></div>
 </div>
 <div class="sub_div">
-  <p style="padding: 0px 25px;">&copy; This enhanced spreadsheet is based on <a href="https://github.com/marzsocks/ipgrid" target="_blank" rel="noopener noreferrer">ipgrid</a> by Michael Roberg <br>
+  <p>&copy; This enhanced spreadsheet is based on <a href="https://github.com/marzsocks/ipgrid" target="_blank" rel="noopener noreferrer">ipgrid</a> by Michael Roberg <br>
     &copy; The favicon is <a href="https://www.flaticon.com/free-icon/hashtag_9595849" target="_blank" rel="noopener noreferrer">by vectaicon</a> - Flaticon</p>
 </div>
 </body>

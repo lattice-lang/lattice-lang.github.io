@@ -8,19 +8,15 @@
   <link href="favicon.ico?v=M44lzPylqQ" rel="icon" />
 
   <script>
-
-    $(document).ready(function () {
-
-      $('#demo').ip_Grid({ rows: 1000,  cols: 26 });
-      $('#demo').ip_LoadDataFromQueryString();
-
-    });
-    function copyToClipboard() {
-      const copyText = ip_GenerateQueryStringFromGridData('demo');
-      navigator.clipboard.writeText(copyText).then(() => {
-        $( "#popUp" ).show();
-        setTimeout(function() { $( "#popUp" ).hide(); }, 2000);
-      });
+    function buildRedirectLink(id, number) {
+      let sheet_url = "sheet.html";
+      let queryStr = '';
+      if (number === 1) queryStr = '&B3=value%C2%A7x&B3=colWidth%C2%A7146&C3=value%C2%A73&C3=colWidth%C2%A7208&B4=value%C2%A7y&B4=colWidth%C2%A7146&C4=value%C2%A74&C4=colWidth%C2%A7208&B5=value%C2%A7x%5E2&B5=colWidth%C2%A7146&C5=formula%C2%A7%3DC3*C3&C5=colWidth%C2%A7208&B6=value%C2%A7y%5E2&B6=colWidth%C2%A7146&C6=formula%C2%A7%3DC4*C4&C6=colWidth%C2%A7208&B7=value%C2%A7x%5E2%C2%A0%2B%C2%A0y%5E2&B7=colWidth%C2%A7146&C7=formula%C2%A7%3Dsum(C5%3AC6)&C7=colWidth%C2%A7208&C8=formula%C2%A7%3Dlambda(C3%3AC4%2CC5%3AC7%2CC7%2C\'sum_of_squares\')&C8=colWidth%C2%A7208&B11=value%C2%A7sum_of_squares(2%2C3)&B11=colWidth%C2%A7146&C11=formula%C2%A7%3Dsum_of_squares(2%2C3)&C11=colWidth%C2%A7208&B12=value%C2%A7C8(5%2C6)&B12=colWidth%C2%A7146&C12=formula%C2%A7%3DC8(5%2C6)&C12=colWidth%C2%A7208';
+      else if (number === 2) queryStr = '&A0=value%C2%A7Function_1&F0=value%C2%A7Function_2&K0=value%C2%A7Note%3A&L0=value%C2%A7This%20example%20program%20converts%20temperature%20from%20Fahrenheit%20(%26%23x2109%3B)%20to%20Celsius%20(%26%23x2103%3B)%20and%20describes%20it%20with%20a%20suitable%20adjective.&L0=colWidth%C2%A7751&A2=formula%C2%A7%3Dlambda(B2%2CB3%3AB5%2CB5%2C%22convert%22)&B2=value%C2%A7212&F2=formula%C2%A7%3Dlambda(G2%2CG3%2CG3%2C%22describe%22)&G2=value%C2%A70&A3=value%C2%A7step_1&B3=formula%C2%A7%3DB2-32&F3=value%C2%A7temperature%20is&G3=formula%C2%A7%3Dif(G2%3E25%2C%22hot%22%2Cif(G2%3E15%2C%22warm%22%2Cif(G2%3E0%2C%22cold%22%2Cif(G2%3C%3D0%2C%22freezing%22%2C%22error%22))))&A4=value%C2%A7step_2&B4=formula%C2%A7%3DB3%2F1.8&A5=value%C2%A7step_3&B5=formula%C2%A7%3Dround(B4%2C1)&A9=value%C2%A7Test%C2%A0Data&A11=value%C2%A7t%20in%20F&B11=value%C2%A7t%20in%20C&C11=value%C2%A7description&A12=value%C2%A78&B12=formula%C2%A7%3Dconvert(A12)&C12=formula%C2%A7%3Ddescribe(B12)&A13=value%C2%A732&B13=formula%C2%A7%3Dconvert(A13)&C13=formula%C2%A7%3Ddescribe(B13)&A14=value%C2%A798&B14=formula%C2%A7%3Dconvert(A14)&C14=formula%C2%A7%3Ddescribe(B14)&A15=value%C2%A767&B15=formula%C2%A7%3Dconvert(A15)&C15=formula%C2%A7%3Ddescribe(B15)&A16=value%C2%A750&B16=formula%C2%A7%3Dconvert(A16)&C16=formula%C2%A7%3Ddescribe(B16)&A17=value%C2%A778&B17=formula%C2%A7%3Dconvert(A17)&C17=formula%C2%A7%3Ddescribe(B17)&A18=value%C2%A737&B18=formula%C2%A7%3Dconvert(A18)&C18=formula%C2%A7%3Ddescribe(B18)';
+      //append example code to 'sheet.html' as a query string
+      sheet_url += '?' + queryStr;
+      //use the resulting link to load the spreadsheet
+      $("#"+id).attr("href", sheet_url);
     }
   </script>
 
@@ -30,82 +26,154 @@
       color: white;
       background-color: #3d3d3d;
       margin: 0;
-      padding: 60px;
+      padding: 50px 100px;
       position:relative;
     }
 
-    a { color:#46b3ff; text-decoration:dotted; }
+    a { color:#46b3ff; text-decoration: none; }
 
-    #eg {
-      border-style: outset;
-      border-width: 2.5px;
+    #grid_link {
       border-color: black;
       background-color: #666666;
-      padding: 5px 10px;
-      font-size: 14px;
-      color: #8fc7ef;
-    }
-
-    #btn {
-      box-shadow: none;
-      border-radius: 0px;
-      background: #8fc7ef none;
-      padding: 5px 10px;
-      font-size: 14px;
-      color: #4d4d4d;
-    }
-
-    #popUp {
-      color: #79d2a0;
-      font-style: oblique 15deg;
-      font-weight: bold;
+      padding: 15px 10px;
+      font-size: 20px;
+      letter-spacing: 2px;
     }
 
     .gridContainer {
+      position: relative;
+      width: 100%;
+      height: 70vh;
+      overflow: scroll;
+    }
 
-      position:relative;
-      width:100%;
-      height:70vh;
+    .gridContainer::-webkit-scrollbar {
+      display: none;
     }
 
     #demo {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
+      align-items: center;
+      line-height: 3;
+    }
 
-      width:100%;
-      height:100%;
+    #lambda-img { width: 100%; }
+
+    .float-child {
+      margin: 0;
+      padding: 30px;
+      font-size: 20px;
+    }
+
+    #how-it-works { text-align: center; }
+
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #4d4d4d;
+    }
+
+    li {
+      float: left;
+    }
+
+    li a, .dropbtn {
+      display: inline-block;
+      color: #e6e6e6;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+
+    li a:hover, .dropdown:hover .dropbtn {
+      background-color: #369be2;
+    }
+
+    li.dropdown {
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #e6e6e6;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+
+    .dropdown-content a:hover {background-color: #bfbfbf;}
+
+    .dropdown:hover .dropdown-content {
+      display: block;
     }
 
     .sub_div {
-
       font-size: 13px;
       position: absolute;
       bottom: 0;
     }
   </style>
 
-  <title>lattice-lang</title>
+  <title>lattice-home</title>
 
 </head>
 <body>
 
 <h1>Lattice</h1>
-<p>Available standard functions: <b style="color:#a8dcf0">concat, count, date, day, dropdown, gantt, head, if, lambda, length, max, min, range, round, sum, tail, today</b>.</p>
-<p>
-  <a id="eg" href="example.html?
-&A0=value%C2%A7Function_1&F0=value%C2%A7Function_2&K0=value%C2%A7Note%3A
-&L0=value%C2%A7This%20example%20program%20converts%20temperature%20from%20Fahrenheit%20(%26%23x2109%3B)%20to%20Celsius%20(%26%23x2103%3B)%20and%20describes%20it%20with%20a%20suitable%20adjective.
-&L0=colWidth%C2%A7751&A2=formula%C2%A7%3Dlambda(B2%2CB3%3AB5%2CB5%2C%22convert%22)&B2=value%C2%A7212&F2=formula%C2%A7%3Dlambda(G2%2CG3%2CG3%2C%22describe%22)&G2=value%C2%A70&A3=value%C2%A7step_1
-&B3=formula%C2%A7%3DB2-32&F3=value%C2%A7temperature%20is&G3=formula%C2%A7%3Dif(G2%3E25%2C%22hot%22%2Cif(G2%3E15%2C%22warm%22%2Cif(G2%3E0%2C%22cold%22%2Cif(G2%3C%3D0%2C%22freezing%22%2C%22error%22))))
-&A4=value%C2%A7step_2&B4=formula%C2%A7%3DB3%2F1.8&A5=value%C2%A7step_3&B5=formula%C2%A7%3Dround(B4%2C1)&A9=value%C2%A7Test%C2%A0Data&A11=value%C2%A7t%20in%20F&B11=value%C2%A7t%20in%20C
-&C11=value%C2%A7description&A12=value%C2%A78&B12=formula%C2%A7%3Dconvert(A12)&C12=formula%C2%A7%3Ddescribe(B12)&A13=value%C2%A732&B13=formula%C2%A7%3Dconvert(A13)&C13=formula%C2%A7%3Ddescribe(B13)
-&A14=value%C2%A798&B14=formula%C2%A7%3Dconvert(A14)&C14=formula%C2%A7%3Ddescribe(B14)&A15=value%C2%A767&B15=formula%C2%A7%3Dconvert(A15)&C15=formula%C2%A7%3Ddescribe(B15)&A16=value%C2%A750
-&B16=formula%C2%A7%3Dconvert(A16)&C16=formula%C2%A7%3Ddescribe(B16)&A17=value%C2%A778&B17=formula%C2%A7%3Dconvert(A17)&C17=formula%C2%A7%3Ddescribe(B17)&A18=value%C2%A737&B18=formula%C2%A7%3Dconvert(A18)
-&C18=formula%C2%A7%3Ddescribe(B18)"
-       target="_blank" rel="noopener noreferrer"><b>EXAMPLE PROGRAM</b></a>&nbsp;&nbsp;&nbsp;
-  <button id="btn" onclick="copyToClipboard()"><b>COPY CONTENTS</b></button>&nbsp;&nbsp;&nbsp;
-  <span id="popUp" style="display: none;"> copied to clipboard! </span>
-</p>
+<div id="#nav_bar">
+  <ul>
+    <li><a href="#demo">Home</a></li>
+    <li><a href="sheet.html" target="_blank" rel="noopener noreferrer">Spreadsheet</a></li>
+    <li><a href="#how-it-works">How it works</a></li>
+    <li class="dropdown">
+      <a href="javascript:void(0)" class="dropbtn">Examples</a>
+      <div class="dropdown-content">
+        <a id="eg1" href="#" onclick="buildRedirectLink(this.id, 1)" target="_blank" rel="noopener noreferrer"><b>Sum of squares</b></a>
+        <a id="eg2" href="#" onclick="buildRedirectLink(this.id, 2)" target="_blank" rel="noopener noreferrer"><b>Temperature &#x2109; to &#x2103;</b></a>
+      </div>
+    </li>
+  </ul>
+</div>
 <div class="gridContainer">
-  <div id="demo"></div>
+  <div id="demo">
+    <div class="float-child"><img id ="lambda-img" src="lambda-example.png" alt="Example Program in Lattice"></div>
+    <div class="float-child">
+      <p>Welcome to our research tool - Lattice!</p>
+      <p id="grid_link_line"><a id="grid_link" href="sheet.html" target="_blank" rel="noopener noreferrer"><b>TRY LATTICE NOW</b></a></p>
+    </div>
+  </div>
+  <div id="how-it-works">
+    <h2>How It Works</h2>
+    <p style="font-size: larger; padding: 10px 20%">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque aliquam vestibulum morbi blandit. In nulla posuere sollicitudin aliquam ultrices. Neque vitae tempus quam pellentesque nec. Tincidunt tortor aliquam nulla facilisi. Neque convallis a cras semper auctor neque vitae tempus quam. Dictum sit amet justo donec enim diam vulputate ut. Convallis convallis tellus id interdum velit laoreet id donec ultrices. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Tempor nec feugiat nisl pretium fusce id velit. At tellus at urna condimentum mattis pellentesque id nibh tortor. Nunc congue nisi vitae suscipit tellus mauris. Magna etiam tempor orci eu lobortis elementum nibh tellus molestie. A scelerisque purus semper eget duis at tellus at urna. Elit ut aliquam purus sit amet luctus venenatis lectus magna. A lacus vestibulum sed arcu non. Sit amet consectetur adipiscing elit pellentesque habitant morbi.
+      Sed risus ultricies tristique nulla aliquet enim tortor at. Integer feugiat scelerisque varius morbi enim nunc. Augue mauris augue neque gravida in fermentum. Enim sit amet venenatis urna cursus eget nunc. Nullam vehicula ipsum a arcu cursus vitae congue. Magna fermentum iaculis eu non. Nisl condimentum id venenatis a condimentum vitae. Pulvinar pellentesque habitant morbi tristique senectus et netus. Id cursus metus aliquam eleifend mi in. Vitae ultricies leo integer malesuada. Netus et malesuada fames ac turpis egestas sed tempus urna. Aliquet sagittis id consectetur purus ut faucibus pulvinar elementum integer. Ut aliquam purus sit amet. Gravida cum sociis natoque penatibus et. Pulvinar etiam non quam lacus suspendisse faucibus interdum posuere. At auctor urna nunc id cursus metus. Maecenas pharetra convallis posuere morbi. Mus mauris vitae ultricies leo integer malesuada nunc vel risus. Molestie a iaculis at erat pellentesque adipiscing commodo elit. Donec ac odio tempor orci dapibus.
+      Lorem sed risus ultricies tristique. Orci eu lobortis elementum nibh tellus molestie nunc. Ridiculus mus mauris vitae ultricies. Quis hendrerit dolor magna eget est. Faucibus scelerisque eleifend donec pretium vulputate sapien nec. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit eget. Netus et malesuada fames ac turpis. Vitae et leo duis ut. Sagittis nisl rhoncus mattis rhoncus urna neque viverra. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Dapibus ultrices in iaculis nunc sed augue. Lobortis scelerisque fermentum dui faucibus in ornare quam. Amet consectetur adipiscing elit pellentesque habitant morbi. Vitae semper quis lectus nulla at volutpat. Magna eget est lorem ipsum dolor sit amet consectetur adipiscing. Cursus sit amet dictum sit amet justo donec. Eu nisl nunc mi ipsum faucibus vitae aliquet nec ullamcorper.
+      Neque aliquam vestibulum morbi blandit cursus risus at ultrices. Vulputate eu scelerisque felis imperdiet proin fermentum leo. Bibendum enim facilisis gravida neque convallis a. Pretium viverra suspendisse potenti nullam. Quam vulputate dignissim suspendisse in est ante in nibh mauris. Elit duis tristique sollicitudin nibh sit amet commodo nulla facilisi. Nunc mattis enim ut tellus elementum sagittis. Nec feugiat in fermentum posuere urna nec tincidunt. Sit amet justo donec enim diam. Consectetur a erat nam at lectus urna duis. Interdum velit laoreet id donec ultrices tincidunt arcu non. Mi sit amet mauris commodo quis imperdiet massa. Nec nam aliquam sem et tortor consequat id porta nibh. Adipiscing commodo elit at imperdiet dui accumsan sit amet. Amet luctus venenatis lectus magna fringilla urna porttitor rhoncus. Enim nec dui nunc mattis enim. Ornare arcu dui vivamus arcu felis bibendum ut tristique et.
+      Ut venenatis tellus in metus vulputate. Suspendisse interdum consectetur libero id faucibus nisl tincidunt. Pellentesque massa placerat duis ultricies lacus sed. Libero volutpat sed cras ornare arcu dui vivamus. Dictum at tempor commodo ullamcorper a. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing vitae. Et molestie ac feugiat sed. Viverra maecenas accumsan lacus vel. Morbi tristique senectus et netus et malesuada fames. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo. Sed nisi lacus sed viverra tellus in hac habitasse.
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque aliquam vestibulum morbi blandit. In nulla posuere sollicitudin aliquam ultrices. Neque vitae tempus quam pellentesque nec. Tincidunt tortor aliquam nulla facilisi. Neque convallis a cras semper auctor neque vitae tempus quam. Dictum sit amet justo donec enim diam vulputate ut. Convallis convallis tellus id interdum velit laoreet id donec ultrices. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Tempor nec feugiat nisl pretium fusce id velit. At tellus at urna condimentum mattis pellentesque id nibh tortor. Nunc congue nisi vitae suscipit tellus mauris. Magna etiam tempor orci eu lobortis elementum nibh tellus molestie. A scelerisque purus semper eget duis at tellus at urna. Elit ut aliquam purus sit amet luctus venenatis lectus magna. A lacus vestibulum sed arcu non. Sit amet consectetur adipiscing elit pellentesque habitant morbi.
+      Sed risus ultricies tristique nulla aliquet enim tortor at. Integer feugiat scelerisque varius morbi enim nunc. Augue mauris augue neque gravida in fermentum. Enim sit amet venenatis urna cursus eget nunc. Nullam vehicula ipsum a arcu cursus vitae congue. Magna fermentum iaculis eu non. Nisl condimentum id venenatis a condimentum vitae. Pulvinar pellentesque habitant morbi tristique senectus et netus. Id cursus metus aliquam eleifend mi in. Vitae ultricies leo integer malesuada. Netus et malesuada fames ac turpis egestas sed tempus urna. Aliquet sagittis id consectetur purus ut faucibus pulvinar elementum integer. Ut aliquam purus sit amet. Gravida cum sociis natoque penatibus et. Pulvinar etiam non quam lacus suspendisse faucibus interdum posuere. At auctor urna nunc id cursus metus. Maecenas pharetra convallis posuere morbi. Mus mauris vitae ultricies leo integer malesuada nunc vel risus. Molestie a iaculis at erat pellentesque adipiscing commodo elit. Donec ac odio tempor orci dapibus.
+      Lorem sed risus ultricies tristique. Orci eu lobortis elementum nibh tellus molestie nunc. Ridiculus mus mauris vitae ultricies. Quis hendrerit dolor magna eget est. Faucibus scelerisque eleifend donec pretium vulputate sapien nec. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit eget. Netus et malesuada fames ac turpis. Vitae et leo duis ut. Sagittis nisl rhoncus mattis rhoncus urna neque viverra. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Dapibus ultrices in iaculis nunc sed augue. Lobortis scelerisque fermentum dui faucibus in ornare quam. Amet consectetur adipiscing elit pellentesque habitant morbi. Vitae semper quis lectus nulla at volutpat. Magna eget est lorem ipsum dolor sit amet consectetur adipiscing. Cursus sit amet dictum sit amet justo donec. Eu nisl nunc mi ipsum faucibus vitae aliquet nec ullamcorper.
+      Neque aliquam vestibulum morbi blandit cursus risus at ultrices. Vulputate eu scelerisque felis imperdiet proin fermentum leo. Bibendum enim facilisis gravida neque convallis a. Pretium viverra suspendisse potenti nullam. Quam vulputate dignissim suspendisse in est ante in nibh mauris. Elit duis tristique sollicitudin nibh sit amet commodo nulla facilisi. Nunc mattis enim ut tellus elementum sagittis. Nec feugiat in fermentum posuere urna nec tincidunt. Sit amet justo donec enim diam. Consectetur a erat nam at lectus urna duis. Interdum velit laoreet id donec ultrices tincidunt arcu non. Mi sit amet mauris commodo quis imperdiet massa. Nec nam aliquam sem et tortor consequat id porta nibh. Adipiscing commodo elit at imperdiet dui accumsan sit amet. Amet luctus venenatis lectus magna fringilla urna porttitor rhoncus. Enim nec dui nunc mattis enim. Ornare arcu dui vivamus arcu felis bibendum ut tristique et.
+      Ut venenatis tellus in metus vulputate. Suspendisse interdum consectetur libero id faucibus nisl tincidunt. Pellentesque massa placerat duis ultricies lacus sed. Libero volutpat sed cras ornare arcu dui vivamus. Dictum at tempor commodo ullamcorper a. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing vitae. Et molestie ac feugiat sed. Viverra maecenas accumsan lacus vel. Morbi tristique senectus et netus et malesuada fames. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo. Sed nisi lacus sed viverra tellus in hac habitasse.
+    </p>
+  </div>
 </div>
 <div class="sub_div">
   <p>&copy; This enhanced spreadsheet is based on <a href="https://github.com/marzsocks/ipgrid" target="_blank" rel="noopener noreferrer">ipgrid</a> by Michael Roberg <br>
