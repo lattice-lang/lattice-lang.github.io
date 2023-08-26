@@ -54,11 +54,10 @@
     #demo {
       width: 100%;
       height: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      line-height: 3;
     }
 
     #lambda-img { width: 100%; }
@@ -69,7 +68,7 @@
       font-size: 20px;
     }
 
-    #how-it-works { text-align: center; }
+    #demo, #how-it-works, #examples { text-align: center; }
 
     ul {
       list-style-type: none;
@@ -83,7 +82,7 @@
       float: left;
     }
 
-    li a, .dropbtn {
+    li a {
       display: inline-block;
       color: #e6e6e6;
       text-align: center;
@@ -93,35 +92,8 @@
       text-decoration: none;
     }
 
-    li a:hover, .dropdown:hover .dropbtn {
+    li a:hover {
       background-color: #369be2;
-    }
-
-    li.dropdown {
-      display: inline-block;
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #e6e6e6;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-    }
-
-    .dropdown-content a {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      text-align: left;
-    }
-
-    .dropdown-content a:hover {background-color: #bfbfbf;}
-
-    .dropdown:hover .dropdown-content {
-      display: block;
     }
 
     .sub_div {
@@ -142,36 +114,31 @@
     <li><a href="#demo">Home</a></li>
     <li><a href="sheet.html" target="_blank" rel="noopener noreferrer">Spreadsheet</a></li>
     <li><a href="#how-it-works">How it works</a></li>
-    <li class="dropdown">
-      <a href="javascript:void(0)" class="dropbtn">Examples</a>
-      <div class="dropdown-content">
-        <a id="eg1" href="#" onclick="buildRedirectLink(this.id, 1)" target="_blank" rel="noopener noreferrer"><b>Sum of squares</b></a>
-        <a id="eg2" href="#" onclick="buildRedirectLink(this.id, 2)" target="_blank" rel="noopener noreferrer"><b>Temperature &#x2109; to &#x2103;</b></a>
-      </div>
-    </li>
+    <li><a href="#examples">Examples</a></li>
   </ul>
 </div>
 <div class="gridContainer">
   <div id="demo">
-    <div class="float-child"><img id ="lambda-img" src="lambda-example.png" alt="Example Program in Lattice"></div>
-    <div class="float-child">
-      <p>Welcome to our research tool - Lattice!</p>
-      <p id="grid_link_line"><a id="grid_link" href="sheet.html" target="_blank" rel="noopener noreferrer"><b>TRY LATTICE NOW</b></a></p>
-    </div>
+    <h2>Welcome to Lattice!</h2>
+    <p>Lattice is our research spreadsheet tool, enhanced with sheet-defined lambdas.</p>
+    <p><a id="grid_link" href="sheet.html" target="_blank" rel="noopener noreferrer"><b>TRY LATTICE NOW</b></a></p>
+    <p><img id ="lambda-img" src="lambda-example.png" alt="Example Program in Lattice"></p>
   </div>
   <div id="how-it-works">
     <h2>How It Works</h2>
-    <p style="font-size: larger; padding: 10px 20%">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque aliquam vestibulum morbi blandit. In nulla posuere sollicitudin aliquam ultrices. Neque vitae tempus quam pellentesque nec. Tincidunt tortor aliquam nulla facilisi. Neque convallis a cras semper auctor neque vitae tempus quam. Dictum sit amet justo donec enim diam vulputate ut. Convallis convallis tellus id interdum velit laoreet id donec ultrices. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Tempor nec feugiat nisl pretium fusce id velit. At tellus at urna condimentum mattis pellentesque id nibh tortor. Nunc congue nisi vitae suscipit tellus mauris. Magna etiam tempor orci eu lobortis elementum nibh tellus molestie. A scelerisque purus semper eget duis at tellus at urna. Elit ut aliquam purus sit amet luctus venenatis lectus magna. A lacus vestibulum sed arcu non. Sit amet consectetur adipiscing elit pellentesque habitant morbi.
-      Sed risus ultricies tristique nulla aliquet enim tortor at. Integer feugiat scelerisque varius morbi enim nunc. Augue mauris augue neque gravida in fermentum. Enim sit amet venenatis urna cursus eget nunc. Nullam vehicula ipsum a arcu cursus vitae congue. Magna fermentum iaculis eu non. Nisl condimentum id venenatis a condimentum vitae. Pulvinar pellentesque habitant morbi tristique senectus et netus. Id cursus metus aliquam eleifend mi in. Vitae ultricies leo integer malesuada. Netus et malesuada fames ac turpis egestas sed tempus urna. Aliquet sagittis id consectetur purus ut faucibus pulvinar elementum integer. Ut aliquam purus sit amet. Gravida cum sociis natoque penatibus et. Pulvinar etiam non quam lacus suspendisse faucibus interdum posuere. At auctor urna nunc id cursus metus. Maecenas pharetra convallis posuere morbi. Mus mauris vitae ultricies leo integer malesuada nunc vel risus. Molestie a iaculis at erat pellentesque adipiscing commodo elit. Donec ac odio tempor orci dapibus.
-      Lorem sed risus ultricies tristique. Orci eu lobortis elementum nibh tellus molestie nunc. Ridiculus mus mauris vitae ultricies. Quis hendrerit dolor magna eget est. Faucibus scelerisque eleifend donec pretium vulputate sapien nec. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit eget. Netus et malesuada fames ac turpis. Vitae et leo duis ut. Sagittis nisl rhoncus mattis rhoncus urna neque viverra. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Dapibus ultrices in iaculis nunc sed augue. Lobortis scelerisque fermentum dui faucibus in ornare quam. Amet consectetur adipiscing elit pellentesque habitant morbi. Vitae semper quis lectus nulla at volutpat. Magna eget est lorem ipsum dolor sit amet consectetur adipiscing. Cursus sit amet dictum sit amet justo donec. Eu nisl nunc mi ipsum faucibus vitae aliquet nec ullamcorper.
-      Neque aliquam vestibulum morbi blandit cursus risus at ultrices. Vulputate eu scelerisque felis imperdiet proin fermentum leo. Bibendum enim facilisis gravida neque convallis a. Pretium viverra suspendisse potenti nullam. Quam vulputate dignissim suspendisse in est ante in nibh mauris. Elit duis tristique sollicitudin nibh sit amet commodo nulla facilisi. Nunc mattis enim ut tellus elementum sagittis. Nec feugiat in fermentum posuere urna nec tincidunt. Sit amet justo donec enim diam. Consectetur a erat nam at lectus urna duis. Interdum velit laoreet id donec ultrices tincidunt arcu non. Mi sit amet mauris commodo quis imperdiet massa. Nec nam aliquam sem et tortor consequat id porta nibh. Adipiscing commodo elit at imperdiet dui accumsan sit amet. Amet luctus venenatis lectus magna fringilla urna porttitor rhoncus. Enim nec dui nunc mattis enim. Ornare arcu dui vivamus arcu felis bibendum ut tristique et.
-      Ut venenatis tellus in metus vulputate. Suspendisse interdum consectetur libero id faucibus nisl tincidunt. Pellentesque massa placerat duis ultricies lacus sed. Libero volutpat sed cras ornare arcu dui vivamus. Dictum at tempor commodo ullamcorper a. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing vitae. Et molestie ac feugiat sed. Viverra maecenas accumsan lacus vel. Morbi tristique senectus et netus et malesuada fames. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo. Sed nisi lacus sed viverra tellus in hac habitasse.
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque aliquam vestibulum morbi blandit. In nulla posuere sollicitudin aliquam ultrices. Neque vitae tempus quam pellentesque nec. Tincidunt tortor aliquam nulla facilisi. Neque convallis a cras semper auctor neque vitae tempus quam. Dictum sit amet justo donec enim diam vulputate ut. Convallis convallis tellus id interdum velit laoreet id donec ultrices. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Tempor nec feugiat nisl pretium fusce id velit. At tellus at urna condimentum mattis pellentesque id nibh tortor. Nunc congue nisi vitae suscipit tellus mauris. Magna etiam tempor orci eu lobortis elementum nibh tellus molestie. A scelerisque purus semper eget duis at tellus at urna. Elit ut aliquam purus sit amet luctus venenatis lectus magna. A lacus vestibulum sed arcu non. Sit amet consectetur adipiscing elit pellentesque habitant morbi.
-      Sed risus ultricies tristique nulla aliquet enim tortor at. Integer feugiat scelerisque varius morbi enim nunc. Augue mauris augue neque gravida in fermentum. Enim sit amet venenatis urna cursus eget nunc. Nullam vehicula ipsum a arcu cursus vitae congue. Magna fermentum iaculis eu non. Nisl condimentum id venenatis a condimentum vitae. Pulvinar pellentesque habitant morbi tristique senectus et netus. Id cursus metus aliquam eleifend mi in. Vitae ultricies leo integer malesuada. Netus et malesuada fames ac turpis egestas sed tempus urna. Aliquet sagittis id consectetur purus ut faucibus pulvinar elementum integer. Ut aliquam purus sit amet. Gravida cum sociis natoque penatibus et. Pulvinar etiam non quam lacus suspendisse faucibus interdum posuere. At auctor urna nunc id cursus metus. Maecenas pharetra convallis posuere morbi. Mus mauris vitae ultricies leo integer malesuada nunc vel risus. Molestie a iaculis at erat pellentesque adipiscing commodo elit. Donec ac odio tempor orci dapibus.
-      Lorem sed risus ultricies tristique. Orci eu lobortis elementum nibh tellus molestie nunc. Ridiculus mus mauris vitae ultricies. Quis hendrerit dolor magna eget est. Faucibus scelerisque eleifend donec pretium vulputate sapien nec. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit eget. Netus et malesuada fames ac turpis. Vitae et leo duis ut. Sagittis nisl rhoncus mattis rhoncus urna neque viverra. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Dapibus ultrices in iaculis nunc sed augue. Lobortis scelerisque fermentum dui faucibus in ornare quam. Amet consectetur adipiscing elit pellentesque habitant morbi. Vitae semper quis lectus nulla at volutpat. Magna eget est lorem ipsum dolor sit amet consectetur adipiscing. Cursus sit amet dictum sit amet justo donec. Eu nisl nunc mi ipsum faucibus vitae aliquet nec ullamcorper.
-      Neque aliquam vestibulum morbi blandit cursus risus at ultrices. Vulputate eu scelerisque felis imperdiet proin fermentum leo. Bibendum enim facilisis gravida neque convallis a. Pretium viverra suspendisse potenti nullam. Quam vulputate dignissim suspendisse in est ante in nibh mauris. Elit duis tristique sollicitudin nibh sit amet commodo nulla facilisi. Nunc mattis enim ut tellus elementum sagittis. Nec feugiat in fermentum posuere urna nec tincidunt. Sit amet justo donec enim diam. Consectetur a erat nam at lectus urna duis. Interdum velit laoreet id donec ultrices tincidunt arcu non. Mi sit amet mauris commodo quis imperdiet massa. Nec nam aliquam sem et tortor consequat id porta nibh. Adipiscing commodo elit at imperdiet dui accumsan sit amet. Amet luctus venenatis lectus magna fringilla urna porttitor rhoncus. Enim nec dui nunc mattis enim. Ornare arcu dui vivamus arcu felis bibendum ut tristique et.
-      Ut venenatis tellus in metus vulputate. Suspendisse interdum consectetur libero id faucibus nisl tincidunt. Pellentesque massa placerat duis ultricies lacus sed. Libero volutpat sed cras ornare arcu dui vivamus. Dictum at tempor commodo ullamcorper a. Ornare aenean euismod elementum nisi quis eleifend quam adipiscing vitae. Et molestie ac feugiat sed. Viverra maecenas accumsan lacus vel. Morbi tristique senectus et netus et malesuada fames. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies leo. Sed nisi lacus sed viverra tellus in hac habitasse.
+    <p>In this video we demonstrate how to define a lambda in Lattice using an example of calculating the variance percentage.</p>
+    <iframe width="700" height="479" src="https://www.youtube-nocookie.com/embed/Sj7DeES4b7s?si=L_iKqMXQT6tDF51W" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
+  <div id="examples">
+    <h2>Examples</h2>
+    <p>
+      The first example is the <a id="eg1" href="#" onclick="buildRedirectLink(this.id, 1)" target="_blank" rel="noopener noreferrer"><b>Sum of Squares</b></a>.
+      It refers to a statistical technique used in regression analysis to determine the dispersion of data points
+      <a href="https://www.investopedia.com/terms/s/sum-of-squares.asp#:~:text=The%20term%20sum%20of%20squares,the%20least%20from%20the%20data." target="_blank" rel="noopener noreferrer">[1]</a>
+    </p>
+    <p>
+      The second example is the conversion of <a id="eg2" href="#" onclick="buildRedirectLink(this.id, 2)" target="_blank" rel="noopener noreferrer"><b>Temperature from &#x2109; to &#x2103;</b></a>
+      using the formula: &#x2103; = [ (&#x2109; - 32 ) &times; 5 ] &div; 9
     </p>
   </div>
 </div>
