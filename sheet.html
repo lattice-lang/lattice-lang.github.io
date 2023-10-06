@@ -17,7 +17,7 @@
 
     });
     function copyToClipboard() {
-      const copyText = document.URL + '?' + ip_GenerateQueryStringFromGridData('demo');
+      const copyText = document.URL.split('?')[0]  + '?' + ip_GenerateQueryStringFromGridData('demo');
       navigator.clipboard.writeText(copyText).then(() => {
         $( "#popUp" ).show();
         setTimeout(function() { $( "#popUp" ).hide(); }, 2000);

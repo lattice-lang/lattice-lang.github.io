@@ -5907,13 +5907,13 @@ function ip_ProcessInputDataFromQueryString(GridID, r, c, value) {
     let silcrow = '\u00A7'; // encoded '§' symbol as a delimiter
     let input = value.split(silcrow); //e.g. 'value§hello' -> ['value', 'hello']
     //if the input is a value or a formula, input it into the relevant cell
-    if (input[0] === 'value' || input[0] === 'formula')
+    if (input[0] === 'v' || input[0] === 'f')
         ip_CellInput(GridID, {row: r, col: c, valueRAW: input[1]});
     //if the input is rowHeight, change the height of the relevant row
-    else if (input[0] === 'rowHeight')
+    else if (input[0] === 'r')
         $('#'+GridID).ip_ResizeRow({rows: [r], size: input[1]});
     //if the input is colWidth, change the width of the relevant column
-    else if (input[0] === 'colWidth')
+    else if (input[0] === 'c')
         $('#'+GridID).ip_ResizeColumn({columns: [c], size: input[1]});
 
 }
@@ -18031,10 +18031,10 @@ function ip_GenerateQueryStringFromGridData(GridID) {
             let colWidth = ip_GridProps[GridID].colData[c].width;
             //if the formula is not falsy, encode it and append to the query string (e.g. '&A0=formula'+encoded(§=1+2))
             if (!(formula === "" || formula === null || formula === undefined))
-                result += ip_BuildFinalResultString(coord, 'formula', formula, rowHeight, colWidth);
+                result += ip_BuildFinalResultString(coord, 'f', formula, rowHeight, colWidth);
             //if the value is not falsy, encode it and append to the query string (e.g. '&A1=value'+encoded(§hello))
             else if (!(value === "" || value === null || value === undefined))
-                result += ip_BuildFinalResultString(coord, 'value', value, rowHeight, colWidth);
+                result += ip_BuildFinalResultString(coord, 'v', value, rowHeight, colWidth);
         }
     }
     return result;
@@ -18047,9 +18047,9 @@ function ip_BuildFinalResultString(coord, type, input, rowHeight, colWidth) {
     let result = '';
     result = '&' + coord + '=' + type + silcrow + encodeURIComponent(input);
     //if the row height is different from the default (25), encode it and append to the query string (e.g. '&A0=rowHeight'+encoded(§70))
-    if (rowHeight !== defaultRowHeight) result += '&' + coord + '=rowHeight' + silcrow + encodeURIComponent(rowHeight);
+    if (rowHeight !== defaultRowHeight) result += '&' + coord + '=r' + silcrow + encodeURIComponent(rowHeight);
     //if the col height is different from the default (100), encode it and append to the query string (e.g. '&A1=colWidth'+encoded(§170))
-    if (colWidth !== defaultColWidth) result += '&' + coord + '=colWidth' + silcrow + encodeURIComponent(colWidth);
+    if (colWidth !== defaultColWidth) result += '&' + coord + '=c' + silcrow + encodeURIComponent(colWidth);
 
     return result;
 
