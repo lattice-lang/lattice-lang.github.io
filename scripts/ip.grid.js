@@ -16247,6 +16247,7 @@ function ip_fxMax(GridID, row, col, fxRanges) {
 
     if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'max', row, col); }
 
+    var tmp = null;
     var value = null;
     var type = '';
 
@@ -16280,7 +16281,7 @@ function ip_fxMax(GridID, row, col, fxRanges) {
             }
 
         }
-        else if (tmp == null || fxRanges[i] > tmp) { tmp = fxRanges[i]; }
+        else if (typeof (tmp = ip_fxCalculate(GridID, fxRanges[i])) == 'number' || !isNaN(parseFloat(fxRanges[i]))) { if (value == null || fxRanges[i] > value) { value = parseFloat(fxRanges[i]); } }
         else { throw ip_fxException('1', "Inputs are incorrect, they must be numbers or ranges", 'max', row, col); }
 
     }
@@ -16296,6 +16297,7 @@ function ip_fxMin(GridID, row, col, fxRanges) {
 
     if (arguments.length < 4) { throw ip_fxException('1', "Missing input parameters", 'min', row, col); }
 
+    var tmp = null;
     var value = null;
     GridID = arguments[0];
     row = arguments[1];
@@ -16327,7 +16329,7 @@ function ip_fxMin(GridID, row, col, fxRanges) {
             }
 
         }
-        else if (tmp == null || fxRanges[i] > tmp) { tmp = fxRanges[i]; }
+        else if (typeof (tmp = ip_fxCalculate(GridID, fxRanges[i])) == 'number' || !isNaN(parseFloat(fxRanges[i]))) { if (value == null || fxRanges[i] < value) { value = parseFloat(fxRanges[i]); } }
         else { throw ip_fxException('1', "Inputs are incorrect, they must be numbers or ranges", 'min', row, col); }
 
     }
